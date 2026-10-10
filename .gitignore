@@ -4,9 +4,7 @@ __pycache__/
 venv/
 .env
 
-# large/raw data — don't commit the actual dataset
-data/raw/*
-!data/raw/.gitkeep
+# processed/derived data stays out; raw EMSCAD csv is committed on purpose (private repo)
 data/processed/*.csv
 !data/processed/.gitkeep
 
