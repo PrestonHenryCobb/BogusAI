@@ -2,6 +2,7 @@
 
 import re
 
+from .normalize import MAX_CHARS, normalize, normalize_text
 from .rules import RULES
 
 _COMPILED = [
@@ -16,14 +17,22 @@ _FEATURES = [
 
 
 def find_red_flags(text: str) -> list[dict[str, int | str]]:
-    """Return every red-flag match with character offsets into ``text``."""
+    """Return every red-flag match with character offsets into ``text``.
+
+    Only the first MAX_CHARS characters are examined, and matching runs on a
+    normalized copy (lookalike letters, zero-width characters, letter spacing),
+    with offsets mapped back to the original text.
+    """
+    normalized, index_map = normalize(text)
     flags = []
     for label, pattern, why in _COMPILED:
-        for match in pattern.finditer(text):
+        for match in pattern.finditer(normalized):
+            if match.end() == match.start():
+                continue
             flags.append(
                 {
-                    "start": match.start(),
-                    "end": match.end(),
+                    "start": index_map[match.start()],
+                    "end": index_map[match.end() - 1] + 1,
                     "label": label,
                     "why": why,
                 }
@@ -50,6 +59,7 @@ def rule_risk(text: str) -> str:
 
 def flag_features(text: str) -> dict[str, int]:
     """Return a stable match count for each red-flag rule."""
+    text = normalize_text(text)
     return {
         feature: sum(1 for _match in re.finditer(pattern, text, re.I))
         for feature, pattern in _FEATURES

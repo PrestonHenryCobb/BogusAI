@@ -1,6 +1,5 @@
 """Paste-and-check demo.    streamlit run app/main.py"""
 
-import html
 import sys
 from pathlib import Path
 
@@ -9,7 +8,8 @@ import streamlit as st
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.model.predict import MODEL_PATH, load_model, predict  # noqa: E402
-from src.redflags import find_red_flags  # noqa: E402
+from src.redflags import MAX_CHARS, find_red_flags  # noqa: E402
+from src.redflags.render import highlight_html  # noqa: E402
 
 # Below this the text model has too little to go on (it misses most fraud under ~15 words).
 MIN_WORDS = 15
@@ -50,18 +50,6 @@ VERDICTS = {
 }
 
 
-def highlight(text, flags):
-    parts, pos = [], 0
-    for f in flags:
-        if f["start"] < pos:  # overlapping match; the earlier one already covers it
-            continue
-        parts.append(html.escape(text[pos:f["start"]]))
-        parts.append(f'<mark title="{html.escape(f["label"])}">{html.escape(text[f["start"]:f["end"]])}</mark>')
-        pos = f["end"]
-    parts.append(html.escape(text[pos:]))
-    return "".join(parts).replace("\n", "<br>")
-
-
 st.set_page_config(page_title="Fake Job Detector", page_icon="🔎")
 st.title("Is this job real?")
 st.caption("Paste a job posting or a recruiter's message to check it for signs of a scam.")
@@ -75,7 +63,9 @@ for col, name in zip(st.columns(len(EXAMPLES)), EXAMPLES):
     if col.button(name, use_container_width=True):
         st.session_state["text"] = EXAMPLES[name]
 
-text = st.text_area("Posting or message", key="text", height=220, placeholder="Paste the full text here...")
+text = st.text_area("Posting or message", key="text", height=220, max_chars=MAX_CHARS,
+                    placeholder="Paste the full text here...")
+st.caption("Nothing you paste is saved or logged by this app. Still, don't paste real SSNs, bank details or IDs.")
 
 if text.strip():
     score, risk = predict(text)
@@ -92,7 +82,7 @@ if text.strip():
 
     if flags:
         st.subheader("Red flags")
-        st.markdown(f'<div style="line-height:1.7">{highlight(text, flags)}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="line-height:1.7">{highlight_html(text, flags)}</div>', unsafe_allow_html=True)
         st.write("")
         seen = set()
         for f in flags:
