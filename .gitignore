@@ -14,10 +14,6 @@ models/
 # notebooks checkpoints
 .ipynb_checkpoints/
 
-# R3F background (app/frontend) — dist/index.html *is* committed on purpose:
-# background.py reads it directly so nobody needs Node installed to run the demo.
-app/frontend/node_modules/
-
 # OS/editor
 .DS_Store
 Thumbs.db

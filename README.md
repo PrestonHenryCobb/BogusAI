@@ -17,8 +17,6 @@ src/
   model/            # training, calibration, ablation tiers
   redflags/         # rule-based red-flag extractor
 app/                # Streamlit demo app
-  background.py     # embeds app/frontend's R3F background behind the UI
-  frontend/          # React + three.js/R3F dithered-wave background (see below)
 docs/               # writeups, labor division, limitations slide notes
 ```
 
@@ -40,22 +38,14 @@ python -m src.model.train               # trains tiers A-C
 streamlit run app/main.py               # demo UI
 ```
 
-## App background (app/frontend)
+## App background
 
-The dithered wave behind the UI ([react-bits](https://reactbits.dev)'s `Dither`) is a small
-React + three.js (`@react-three/fiber`, `@react-three/postprocessing`) scene, built to one
-self-contained `app/static/background/index.html` and embedded via `app/background.py`
-using `st.iframe(url, ...)` -- a real `src=` iframe served by Streamlit's static file
-server (`enableStaticServing` in `.streamlit/config.toml`), not an inlined `srcdoc`.
-That distinction isn't cosmetic: `srcdoc` sandboxed iframes were silently freezing
-three.js's render loop (requestAnimationFrame and useFrame both kept firing, but the
-canvas's actual pixels never changed) -- a real `src=` iframe avoids that.
-
-The built file is committed, so running the demo needs no Node install. Only rebuild it
-if you edit `app/frontend/src`:
-
-```bash
-cd app/frontend
-npm install
-npm run build        # writes app/static/background/index.html -- commit the result
-```
+The background is a slow CSS gradient drift, defined inline in `app/main.py`
+(`@keyframes bg-drift` on `stAppViewContainer`). An earlier pass tried a WebGL
+background (React Three Fiber, then a raw WebGL2 effect) embedded under Streamlit;
+both silently froze -- confirmed via instrumentation that JS-side timing/uniforms
+kept updating correctly but the canvas's actual pixels never changed, across three
+different hosting architectures (`srcdoc`, a real `src=` iframe, and a non-Streamlit
+top-level page). That pattern pointed at something system/browser-level rather than
+the code, so the background was redone in plain CSS, which needs no canvas, no
+WebGL, and no iframe, and is guaranteed to animate via the compositor.

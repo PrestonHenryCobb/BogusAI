@@ -8,7 +8,6 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from background import render_background  # noqa: E402
 from src.model.predict import MODEL_PATH, load_model, predict  # noqa: E402
 
 # Swap for C's rule module once it lands; see redflags_placeholder.py for the contract.
@@ -85,24 +84,33 @@ def render_verdict(risk):
 # Case-file theme: ink-navy ground, Plex Mono carrying the display type (a case-file,
 # typewritten register rather than a marketing serif), verdicts rendered as rotated ink
 # stamps, and flagged phrases underlined like a reviewer's redaction marks instead of
-# highlighter yellow. The dithered wave background (app/frontend) reads as a scanned
-# or photocopied document under raking light -- texture appropriate to case files,
-# not decoration for its own sake.
+# highlighter yellow. The background is a slow CSS gradient drift -- three different
+# WebGL approaches (React Three Fiber, raw WebGL2) all silently froze when embedded
+# under Streamlit regardless of hosting architecture, which pointed at something
+# system-level (GPU/extension) rather than our code. Plain CSS sidesteps that
+# entirely: no canvas, no WebGL, no iframe, guaranteed to animate.
 st.set_page_config(page_title="Fake Job Detector", page_icon="🔎")
-render_background()
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 
 html, body, [class*="css"] { font-family: 'IBM Plex Sans', sans-serif; }
 
-/* The theme's navy fill lands on stApp (position:absolute, paints above our
-   fixed/negative-z-index background div regardless of DOM nesting) -- every
-   ancestor down to stAppViewContainer has to be transparent, not just the one
-   that visually "looks like" the page background. */
-html, body,
-[data-testid="stApp"],
-[data-testid="stAppViewContainer"] { background: transparent !important; }
+@keyframes bg-drift {
+    0%   { background-position: 0% 0%, 100% 100%, 50% 50%; }
+    50%  { background-position: 100% 50%, 0% 50%, 80% 20%; }
+    100% { background-position: 0% 0%, 100% 100%, 50% 50%; }
+}
+html, body, [data-testid="stApp"] { background: #070b14 !important; }
+[data-testid="stAppViewContainer"] {
+    background-color: #070b14 !important;
+    background-image:
+        radial-gradient(circle, rgba(91,122,157,0.28), transparent 45%),
+        radial-gradient(circle, rgba(201,138,44,0.1), transparent 40%),
+        radial-gradient(circle, rgba(91,122,157,0.16), transparent 55%);
+    background-size: 200% 200%;
+    animation: bg-drift 36s ease-in-out infinite;
+}
 [data-testid="stHeader"] { background: transparent; }
 [data-testid="stMainBlockContainer"] { padding-top: 3.5rem; max-width: 700px; }
 
@@ -204,22 +212,6 @@ mark.flag {
 h2, h3 { color: #eae6da !important; font-family: 'IBM Plex Mono', monospace !important; font-weight: 600 !important; }
 [data-testid="stMarkdownContainer"] p, [data-testid="stMarkdownContainer"] li { color: #c7cbd6; }
 [data-testid="stMarkdownContainer"] strong { color: #eae6da; }
-
-/* Pin the R3F background iframe (app/background.py) full-bleed behind everything */
-[data-testid="stElementContainer"]:has(> iframe) {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    z-index: -1 !important;
-    overflow: visible !important;
-}
-[data-testid="stElementContainer"]:has(> iframe) iframe {
-    width: 100vw !important;
-    height: 100vh !important;
-    border: none !important;
-    pointer-events: none !important;
-}
 </style>
 """, unsafe_allow_html=True)
 
