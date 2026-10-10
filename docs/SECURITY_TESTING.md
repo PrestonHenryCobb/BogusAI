@@ -40,7 +40,7 @@ git checkout main && git pull
 | Command | Expected |
 |---|---|
 | `python -m unittest tests.test_redflags tests.test_security` | `Ran 26 tests ... OK` |
-| `python tests/app_smoke.py` | 7 lines starting `PASS`, exit code 0 |
+| `python tests/app_smoke.py` | 9 lines starting `PASS`, exit code 0 |
 | `streamlit run app/main.py` | opens http://localhost:8501 |
 
 If a test fails, don't demo that protection; tell the team which line failed.
@@ -148,10 +148,10 @@ pops up.
 
 ## Known limits to mention if asked
 
-- **Model verdict vs rules:** the banner uses the model's score only. A blatant
-  scam with 6 red flags can still read "Some risk" because the EMSCAD-trained
-  model scores modern wording low (tier B scores ROC-AUC 0.60 on the challenge
-  set). The highlighted flags are the stronger signal on stage.
+- **Quiet scams:** the banner shows the higher of the model's risk and the
+  red-flag rules' risk, so a scam the model scores low can still read high.
+  Rules only fire on explicit phrasing, and the model was trained on 2012-2014
+  postings, so a scam with neither pattern can still read low.
 - **Model files are pickles:** only load a `model.joblib` you trained yourself.
 - **Dependencies are unpinned** and the EMSCAD CSV is committed to this repo.
   Both are called out in the security review and need a team decision.
