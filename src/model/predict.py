@@ -12,6 +12,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 
 from src.model.features import build_frame
+from src.redflags.normalize import normalize_text
 
 MODEL_PATH = Path(__file__).resolve().parents[2] / "models" / "model.joblib"
 
@@ -66,6 +67,6 @@ def predict(text, meta=None, model=None):
     "medium" | "high").
     """
     model = model or load_model()
-    row = {**(meta or {}), "description": text}
+    row = {**(meta or {}), "description": normalize_text(text)}
     score = float(model.score(build_frame(pd.DataFrame([row])))[0])
     return score, model.risk_label(score)

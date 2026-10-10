@@ -1,6 +1,5 @@
 """Paste-and-check demo.    streamlit run app/main.py"""
 
-import html
 import re
 import sys
 from pathlib import Path
@@ -11,9 +10,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from background import render_background  # noqa: E402
 from src.model.predict import MODEL_PATH, load_model, predict  # noqa: E402
-
-# Swap for C's rule module once it lands; see redflags_placeholder.py for the contract.
-from redflags_placeholder import find_red_flags  # noqa: E402
+from src.redflags import MAX_CHARS, find_red_flags  # noqa: E402
+from src.redflags.render import highlight_html  # noqa: E402
 
 # Below this the text model has too little to go on (it misses most fraud under ~15 words).
 MIN_WORDS = 15
@@ -63,18 +61,6 @@ def page_html(markup):
     # Curly apostrophes too: page copy never uses single-quoted HTML attributes.
     markup = re.sub(r"\n\s*", "\n", markup).replace("$", "&#36;").replace("'", "’")
     st.markdown(markup, unsafe_allow_html=True)
-
-
-def highlight(text, flags):
-    parts, pos = [], 0
-    for f in flags:
-        if f["start"] < pos:  # overlapping match; the earlier one already covers it
-            continue
-        parts.append(html.escape(text[pos:f["start"]]))
-        parts.append(f'<mark class="flag" title="{html.escape(f["label"])}">{html.escape(text[f["start"]:f["end"]])}</mark>')
-        pos = f["end"]
-    parts.append(html.escape(text[pos:]))
-    return "".join(parts).replace("\n", "<br>").replace("$", "&#36;")
 
 
 def render_verdict(risk):
@@ -470,7 +456,7 @@ a:focus-visible, summary:focus-visible, button:focus-visible {
 [data-testid="stAlertContainer"] { border-radius: 6px !important; border: 1px solid rgba(125,156,196,0.35) !important; background: rgba(125,156,196,0.08) !important; }
 [data-testid="stMetricLabel"] p { color: var(--muted) !important; font-size: 0.82rem !important; }
 [data-testid="stMetricValue"] { color: var(--paper) !important; font-family: var(--serif) !important; font-variant-numeric: tabular-nums; }
-mark.flag { background: transparent; color: inherit; border-bottom: 2px solid var(--amber); padding: 0; }
+mark.flag, .st-key-tool mark { background: transparent; color: inherit; border-bottom: 2px solid var(--amber); padding: 0; }
 
 @media (max-width: 860px) {
     .nav { grid-template-columns: 1fr auto; }
@@ -507,9 +493,9 @@ st.markdown("""
 textarea, input { caret-color: var(--amber); }
 a { text-underline-offset: 0.2em; }
 
-/* The underline motif: a background stroke (not a border) so it can draw across
+/* The underline motif (C's renderer emits plain <mark> in the tool): a background stroke (not a border) so it can draw across
    line wraps, which a transform on a pseudo-element can't do for inline text. */
-mark.flag {
+mark.flag, .st-key-tool mark {
     border-bottom: none !important;
     padding-bottom: 1px !important;
     background-image: linear-gradient(var(--amber), var(--amber)) !important;
@@ -852,7 +838,8 @@ with st.container(key="tool"):
         if col.button(name, use_container_width=True):
             st.session_state["text"] = EXAMPLES[name]
 
-    text = st.text_area("Posting or message", key="text", height=220, placeholder="Paste the full text here…")
+    text = st.text_area("Posting or message", key="text", height=220, placeholder="Paste the full text here…", max_chars=MAX_CHARS)
+    st.caption("Nothing you paste is saved or logged by this app. Still, don't paste real SSNs, bank details or IDs.")
 
     if text.strip():
         score, risk = predict(text)
@@ -868,7 +855,7 @@ with st.container(key="tool"):
 
         if flags:
             st.subheader("Red flags")
-            st.markdown(f'<div style="line-height:1.7">{highlight(text, flags)}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div style="line-height:1.7">{highlight_html(text, flags).replace("$", "&#36;")}</div>', unsafe_allow_html=True)
             st.write("")
             seen = set()
             for f in flags:
@@ -927,9 +914,9 @@ page_html("""
         <div class="faq">
             <details>
                 <summary>How accurate is it?</summary>
-                <p>In our tests on job postings it hadn't seen, it caught about 4 in 5 scams, and about 9 in 10
-                of its high-risk labels were correct. It's less reliable on newer scams, which is why it shows
-                you each red flag.</p>
+                <p>On job postings from 2012 to 2014 it hadn't seen, the model marked about 4 in 5 scams as high
+                risk. On recent scam patterns it marks only about 1 in 10, and rates half of them low risk. The
+                red flags are what catch most modern scams, so read each one rather than relying on the score.</p>
             </details>
             <details>
                 <summary>It said low risk. Am I safe?</summary>

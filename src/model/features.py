@@ -13,7 +13,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import FunctionTransformer, OneHotEncoder, StandardScaler
 
 # Profile last: tier D truncates long text, and pasted text arrives as `description`.
 TEXT_FIELDS = ["title", "description", "requirements", "benefits", "company_profile"]
@@ -38,6 +38,7 @@ TIERS = {
     "C": (True, True, False),
     "C-noshortcut": (True, True, True),
     "D": (False, True, False),  # fine-tuned DistilBERT, see bert.py
+    "E": (False, True, False),  # tier B + C's red-flag rule indicators
 }
 # Not trained unless asked for: slow, and needs requirements-bert.txt.
 OPTIONAL_TIERS = ["D"]
@@ -73,6 +74,12 @@ def build_frame(raw):
     return out
 
 
+def redflag_matrix(texts):
+    """One 0/1 column per rule in src.redflags: did it fire anywhere in the text."""
+    from src.redflags import flag_features
+    return np.array([[min(count, 1) for count in flag_features(t).values()] for t in texts], dtype=float)
+
+
 def make_pipeline(tier):
     if tier == "D":
         from src.model.bert import BertClassifier
@@ -90,6 +97,8 @@ def make_pipeline(tier):
         tfidf = TfidfVectorizer(ngram_range=(1, 2), min_df=3, max_features=100_000,
                                 sublinear_tf=True, stop_words="english")
         transformers.append(("tfidf", tfidf, "text"))
+    if tier == "E":
+        transformers.append(("redflags", FunctionTransformer(redflag_matrix), "text"))
     return Pipeline([
         ("features", ColumnTransformer(transformers)),
         # C=10: PR-AUC plateaus there under duplicate-aware CV; C=1 underfits the text tiers.

@@ -1,4 +1,4 @@
-"""Train tiers A-C (+ shortcut ablations), calibrate, pick thresholds, write artifacts.
+"""Train tiers A-C and E (+ shortcut ablations), calibrate, pick thresholds, write artifacts.
 
     python -m src.model.train                 # uses A's data/processed/splits.json
     python -m src.model.train --dev-split     # until splits.json exists; numbers not reportable
@@ -134,7 +134,7 @@ def main():
     split_note = "**DEV SPLIT (not group-aware) — do not report.**" if args.dev_split else f"Splits: `{args.splits.name}`."
     note = (f"{split_note} Calibration: {args.calibration}. "
             f"Threshold = lowest with validation precision >= {args.precision_target:.2f} "
-            f"(out-of-fold for A-C, last fold only for D).")
+            f"(out-of-fold for A-C and E, last fold only for D).")
     (args.out / "ablation.md").write_text(to_markdown(table, note))
     print(table.to_string(index=False, float_format="%.3f"))
     if args.deploy_tier not in args.tiers:
