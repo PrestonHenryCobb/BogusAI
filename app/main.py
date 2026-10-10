@@ -85,8 +85,9 @@ def render_verdict(risk):
 # Case-file theme: ink-navy ground, Plex Mono carrying the display type (a case-file,
 # typewritten register rather than a marketing serif), verdicts rendered as rotated ink
 # stamps, and flagged phrases underlined like a reviewer's redaction marks instead of
-# highlighter yellow. The drifting node graph behind everything (app/frontend) stands
-# in for a fraud ring's link analysis, not decoration for its own sake.
+# highlighter yellow. The dithered wave background (app/frontend) reads as a scanned
+# or photocopied document under raking light -- texture appropriate to case files,
+# not decoration for its own sake.
 st.set_page_config(page_title="Fake Job Detector", page_icon="🔎")
 render_background()
 st.markdown("""

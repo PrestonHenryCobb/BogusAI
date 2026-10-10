@@ -18,7 +18,7 @@ src/
   redflags/         # rule-based red-flag extractor
 app/                # Streamlit demo app
   background.py     # embeds app/frontend's R3F background behind the UI
-  frontend/          # React + three.js/R3F link-analysis background (see below)
+  frontend/          # React + three.js/R3F dithered-wave background (see below)
 docs/               # writeups, labor division, limitations slide notes
 ```
 
@@ -42,11 +42,11 @@ streamlit run app/main.py               # demo UI
 
 ## App background (app/frontend)
 
-The drifting node-graph behind the UI is a small React + three.js (`@react-three/fiber`,
-`@react-three/postprocessing`) scene, built to one self-contained `dist/index.html` and
-embedded via `app/background.py` using `st.components.v1.html`. The built file is
-committed, so running the demo needs no Node install. Only rebuild it if you edit
-`app/frontend/src/Scene.tsx`:
+The dithered wave behind the UI ([react-bits](https://reactbits.dev)'s `Dither`) is a small
+React + three.js (`@react-three/fiber`, `@react-three/postprocessing`) scene, built to one
+self-contained `dist/index.html` and embedded via `app/background.py` using
+`st.components.v1.html`. The built file is committed, so running the demo needs no Node
+install. Only rebuild it if you edit `app/frontend/src`:
 
 ```bash
 cd app/frontend

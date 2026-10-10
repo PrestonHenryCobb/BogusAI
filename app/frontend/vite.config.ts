@@ -1,3 +1,4 @@
+import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { viteSingleFile } from 'vite-plugin-singlefile'
@@ -6,7 +7,7 @@ import { viteSingleFile } from 'vite-plugin-singlefile'
 // components.v1.html, so there's no static file server to point separate
 // JS/CSS assets at.
 export default defineConfig({
-  plugins: [react(), viteSingleFile()],
+  plugins: [react(), tailwindcss(), viteSingleFile()],
   build: {
     cssCodeSplit: false,
   },
