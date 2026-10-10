@@ -98,18 +98,22 @@ html, body, [class*="css"] { font-family: 'IBM Plex Sans', sans-serif; }
 html { scroll-behavior: smooth; }
 
 @keyframes bg-drift {
-    0%   { background-position: 0% 0%, 100% 100%, 50% 50%; }
-    50%  { background-position: 100% 50%, 0% 50%, 80% 20%; }
-    100% { background-position: 0% 0%, 100% 100%, 50% 50%; }
+    0%   { background-position: 0 0, 0% 0%, 100% 100%, 50% 50%; }
+    50%  { background-position: 0 0, 100% 50%, 0% 50%, 80% 20%; }
+    100% { background-position: 0 0, 0% 0%, 100% 100%, 50% 50%; }
 }
 html, body, [data-testid="stApp"] { background: #070b14 !important; }
 [data-testid="stAppViewContainer"] {
     background-color: #070b14 !important;
+    /* A static halftone dot grid under the three drifting glows -- the texture
+       reads as scanned/photocopied paper, which the WebGL dither pass was
+       standing in for before it had to be dropped. */
     background-image:
+        radial-gradient(circle, rgba(234,230,218,0.07) 1px, transparent 1.3px),
         radial-gradient(circle, rgba(91,122,157,0.28), transparent 45%),
-        radial-gradient(circle, rgba(201,138,44,0.1), transparent 40%),
+        radial-gradient(circle, rgba(201,138,44,0.12), transparent 40%),
         radial-gradient(circle, rgba(91,122,157,0.16), transparent 55%);
-    background-size: 200% 200%;
+    background-size: 15px 15px, 200% 200%, 200% 200%, 200% 200%;
     animation: bg-drift 36s ease-in-out infinite;
 }
 [data-testid="stHeader"] { background: transparent; }
@@ -148,8 +152,8 @@ html, body, [data-testid="stApp"] { background: #070b14 !important; }
 }
 .nav-link:hover { color: #eae6da !important; }
 .nav-cta {
-    background: #5b7a9d;
-    color: #070b14 !important;
+    background: #c98a2c;
+    color: #0b0902 !important;
     padding: 0.42rem 0.95rem;
     border-radius: 999px;
     font-weight: 600;
@@ -158,38 +162,47 @@ html, body, [data-testid="stApp"] { background: #070b14 !important; }
     white-space: nowrap;
     transition: background 0.15s ease;
 }
-.nav-cta:hover { background: #79a0c9; }
+.nav-cta:hover { background: #e0a649; }
 
-/* Hero */
+/* Hero: left-aligned copy next to an "evidence card" lifted from the actual
+   scam-posting example below -- the point is to show the mechanism (a
+   flagged phrase, a reason) in the first five seconds, not just assert it
+   in marketing copy. */
 .hero {
     min-height: 88vh;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 6rem 1rem 2rem;
+    padding: 6rem 1.5rem 2rem;
     scroll-margin-top: 5rem;
+}
+.hero-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 3.5rem;
+    align-items: center;
+    max-width: 1000px;
+    margin: 0 auto;
+    width: 100%;
 }
 .hero-title {
     font-family: 'IBM Plex Mono', monospace;
     font-weight: 600;
-    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-size: clamp(2.3rem, 4.6vw, 3.4rem);
     letter-spacing: -0.01em;
     color: #eae6da;
     margin: 0 0 1rem;
 }
 .hero-sub {
     color: #a9afc0;
-    font-size: 1.1rem;
+    font-size: 1.08rem;
     line-height: 1.6;
-    max-width: 34rem;
+    max-width: 30rem;
     margin: 0 0 2rem;
 }
 .hero-actions { display: flex; align-items: center; gap: 1.6rem; }
 .hero-cta {
-    background: #5b7a9d;
-    color: #070b14 !important;
+    background: #c98a2c;
+    color: #0b0902 !important;
     padding: 0.75rem 1.6rem;
     border-radius: 999px;
     font-family: 'IBM Plex Mono', monospace;
@@ -199,7 +212,7 @@ html, body, [data-testid="stApp"] { background: #070b14 !important; }
     white-space: nowrap;
     transition: background 0.15s ease, transform 0.15s ease;
 }
-.hero-cta:hover { background: #79a0c9; transform: translateY(-1px); }
+.hero-cta:hover { background: #e0a649; transform: translateY(-1px); }
 .hero-more {
     color: #8c93a6 !important;
     font-size: 0.92rem;
@@ -209,15 +222,70 @@ html, body, [data-testid="stApp"] { background: #070b14 !important; }
 }
 .hero-more:hover { color: #eae6da !important; border-color: #eae6da; }
 
-/* Phones: the nav pill has no room for the About link at full width, and
-   the hero actions stack instead of forcing both pills onto one tight row. */
+/* Evidence card: a clipped excerpt from a real flagged posting, pinned at a
+   slight tilt like something pulled onto a case board, with its own small
+   "flagged" stamp -- reuses the exact verdict-stamp and flag-underline
+   language from the tool itself instead of inventing new chrome. */
+.hero-evidence { position: relative; }
+.evidence-card {
+    background: #10172a;
+    border: 1px solid rgba(234,230,218,0.14);
+    border-radius: 4px;
+    padding: 1.5rem 1.6rem;
+    transform: rotate(-1.6deg);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+}
+.evidence-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: #8c93a6;
+    margin: 0 0 0.8rem;
+}
+.evidence-text {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.86rem;
+    line-height: 1.75;
+    color: #c7cbd6;
+    margin: 0;
+}
+.evidence-tag {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(234,230,218,0.12);
+    font-size: 0.82rem;
+    color: #e0a649;
+    line-height: 1.5;
+}
+.evidence-stamp {
+    position: absolute;
+    top: -0.9rem;
+    right: 0.8rem;
+    transform: rotate(7deg);
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #c1443c;
+    border: 2px double #c1443c;
+    border-radius: 4px;
+    padding: 0.3rem 0.55rem;
+    background: #070b14;
+    user-select: none;
+}
+
+/* Phones: the nav pill has no room for the About link at full width, the
+   hero drops to one column with the evidence card below the copy, and the
+   hero actions stack instead of forcing both onto one tight row. */
 @media (max-width: 480px) {
     .nav-pill { gap: 0.6rem; padding: 0.5rem 0.5rem 0.5rem 0.9rem; }
     .nav-link { display: none; }
     .nav-brand { font-size: 0.72rem; }
     .nav-cta { font-size: 0.74rem; padding: 0.4rem 0.8rem; }
     .hero { padding: 7rem 1.25rem 2rem; }
-    .hero-actions { flex-direction: column; gap: 1rem; }
+    .hero-grid { grid-template-columns: 1fr; gap: 2.5rem; text-align: left; }
+    .hero-actions { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .evidence-card { transform: none; }
 }
 
 /* About / how-it-works */
@@ -360,12 +428,26 @@ st.markdown("""
 </div>
 
 <div class="hero" id="hero">
-    <h1 class="hero-title">Is this job real?</h1>
-    <p class="hero-sub">Paste a posting or a recruiter's message. We'll check it against patterns from real
-    job scams and flag the specific phrases worth a second look.</p>
-    <div class="hero-actions">
-        <a href="#app-anchor" class="hero-cta">Check a posting</a>
-        <a href="#about" class="hero-more">See how it works</a>
+    <div class="hero-grid">
+        <div class="hero-copy">
+            <h1 class="hero-title">Is this job real?</h1>
+            <p class="hero-sub">Paste a posting or a recruiter's message. We'll check it against patterns from real
+            job scams and flag the specific phrases worth a second look.</p>
+            <div class="hero-actions">
+                <a href="#app-anchor" class="hero-cta">Check a posting</a>
+                <a href="#about" class="hero-more">See how it works</a>
+            </div>
+        </div>
+        <div class="hero-evidence">
+            <div class="evidence-card">
+                <p class="evidence-label">From a real flagged posting</p>
+                <p class="evidence-text">...To secure your position, pay a $60
+                <mark class="flag">registration fee</mark> for your starter kit, which is refunded with your
+                first paycheck...</p>
+                <p class="evidence-tag">Upfront payment: real employers don't charge you to get hired.</p>
+            </div>
+            <div class="evidence-stamp">Flagged</div>
+        </div>
     </div>
 </div>
 
