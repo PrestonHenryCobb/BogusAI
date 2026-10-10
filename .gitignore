@@ -8,11 +8,8 @@ venv/
 data/processed/*.csv
 !data/processed/.gitkeep
 
-# model artifacts
-*.pkl
-*.joblib
-*.pt
-*.bin
+# model artifacts — regenerate with `python -m src.model.train`
+models/
 
 # notebooks checkpoints
 .ipynb_checkpoints/
