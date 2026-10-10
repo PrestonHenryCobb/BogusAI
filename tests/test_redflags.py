@@ -216,6 +216,30 @@ class FindRedFlagsTests(unittest.TestCase):
 
         self.assertLess(elapsed, 1.0)
 
+    def test_common_legit_phrasings_are_not_flagged(self):
+        for text in (
+            "Duties include processing payments and answering billing inquiries.",
+            "Starting Pay $9 to $12 per hour plus bonuses.",
+            "Shyp Hero arrives within minutes of a pick-up request.",
+            "Interest in Bitcoin and crypto-tech is a plus; main tasks include QA.",
+        ):
+            with self.subTest(text=text):
+                self.assertEqual(find_red_flags(text), [])
+
+    def test_challenge_set_scams_are_flagged_and_legit_rows_are_not_high(self):
+        import csv
+        from pathlib import Path
+
+        path = Path(__file__).resolve().parents[1] / "data" / "challenge_set" / "challenge_set.csv"
+        if not path.exists():
+            self.skipTest("challenge_set.csv not on this branch")
+        with path.open(encoding="utf-8", newline="") as f:
+            rows = list(csv.DictReader(f))
+        missed = [r["id"] for r in rows if r["label"] == "1" and not find_red_flags(r["text"])]
+        false_high = [r["id"] for r in rows if r["label"] == "0" and rule_risk(r["text"]) == "high"]
+        self.assertEqual(missed, [])
+        self.assertEqual(false_high, [])
+
 
 if __name__ == "__main__":
     unittest.main()

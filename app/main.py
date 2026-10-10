@@ -9,9 +9,7 @@ import streamlit as st
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.model.predict import MODEL_PATH, load_model, predict  # noqa: E402
-
-# Swap for C's rule module once it lands; see redflags_placeholder.py for the contract.
-from redflags_placeholder import find_red_flags  # noqa: E402
+from src.redflags import find_red_flags  # noqa: E402
 
 # Below this the text model has too little to go on (it misses most fraud under ~15 words).
 MIN_WORDS = 15
