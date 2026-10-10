@@ -17,6 +17,8 @@ src/
   model/            # training, calibration, ablation tiers
   redflags/         # rule-based red-flag extractor
 app/                # Streamlit demo app
+  background.py     # embeds the GhostFibers background behind the page
+  frontend/         # React build of the GhostFibers background
 docs/               # writeups, labor division, limitations slide notes
 ```
 
@@ -40,12 +42,13 @@ streamlit run app/main.py               # demo UI
 
 ## App background
 
-The background is a slow CSS gradient drift, defined inline in `app/main.py`
-(`@keyframes bg-drift` on `stAppViewContainer`). An earlier pass tried a WebGL
-background (React Three Fiber, then a raw WebGL2 effect) embedded under Streamlit;
-both silently froze -- confirmed via instrumentation that JS-side timing/uniforms
-kept updating correctly but the canvas's actual pixels never changed, across three
-different hosting architectures (`srcdoc`, a real `src=` iframe, and a non-Streamlit
-top-level page). That pattern pointed at something system/browser-level rather than
-the code, so the background was redone in plain CSS, which needs no canvas, no
-WebGL, and no iframe, and is guaranteed to animate via the compositor.
+The animated background is react-bits' `GhostFibers` (raw WebGL2), in `app/frontend`. It's
+built to one self-contained `app/frontend/dist/index.html` and embedded behind the page by
+`app/background.py` via `st.components.v1.html`. The built file is committed, so running the
+demo needs no Node install. Only rebuild if you edit `app/frontend/src`:
+
+```bash
+cd app/frontend
+npm install
+npm run build        # writes dist/index.html -- commit the result
+```
