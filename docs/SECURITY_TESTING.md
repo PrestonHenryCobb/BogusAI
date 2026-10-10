@@ -16,7 +16,7 @@ From the repo root, in PowerShell:
 
 ```powershell
 python -m venv .venv
-.venv\Scriptsctivate
+.venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
