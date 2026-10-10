@@ -95,6 +95,7 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 
 html, body, [class*="css"] { font-family: 'IBM Plex Sans', sans-serif; }
+html { scroll-behavior: smooth; }
 
 @keyframes bg-drift {
     0%   { background-position: 0% 0%, 100% 100%, 50% 50%; }
@@ -112,16 +113,152 @@ html, body, [data-testid="stApp"] { background: #070b14 !important; }
     animation: bg-drift 36s ease-in-out infinite;
 }
 [data-testid="stHeader"] { background: transparent; }
-[data-testid="stMainBlockContainer"] { padding-top: 3.5rem; max-width: 700px; }
+[data-testid="stMainBlockContainer"] { padding-top: 0 !important; max-width: 760px; }
+
+/* Floating glass nav pill */
+.nav-pill {
+    position: fixed;
+    top: 1.1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    padding: 0.55rem 0.6rem 0.55rem 1.1rem;
+    border-radius: 999px;
+    background: rgba(16,23,42,0.6);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    border: 1px solid rgba(234,230,218,0.14);
+    box-shadow: 0 10px 34px rgba(0,0,0,0.38);
+}
+.nav-brand {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    color: #eae6da;
+    font-size: 0.84rem;
+    white-space: nowrap;
+}
+.nav-link {
+    color: #a9afc0 !important;
+    text-decoration: none !important;
+    font-size: 0.84rem;
+    transition: color 0.15s ease;
+}
+.nav-link:hover { color: #eae6da !important; }
+.nav-cta {
+    background: #5b7a9d;
+    color: #070b14 !important;
+    padding: 0.42rem 0.95rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    text-decoration: none !important;
+    white-space: nowrap;
+    transition: background 0.15s ease;
+}
+.nav-cta:hover { background: #79a0c9; }
 
 /* Hero */
-h1 {
+.hero {
+    min-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 1rem 2rem;
+    scroll-margin-top: 5rem;
+}
+.hero-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    letter-spacing: -0.01em;
+    color: #eae6da;
+    margin: 0 0 1rem;
+}
+.hero-sub {
+    color: #a9afc0;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 34rem;
+    margin: 0 0 2rem;
+}
+.hero-actions { display: flex; align-items: center; gap: 1.6rem; }
+.hero-cta {
+    background: #5b7a9d;
+    color: #070b14 !important;
+    padding: 0.75rem 1.6rem;
+    border-radius: 999px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none !important;
+    white-space: nowrap;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+.hero-cta:hover { background: #79a0c9; transform: translateY(-1px); }
+.hero-more {
+    color: #8c93a6 !important;
+    font-size: 0.92rem;
+    text-decoration: none !important;
+    border-bottom: 1px solid rgba(140,147,166,0.4);
+    white-space: nowrap;
+}
+.hero-more:hover { color: #eae6da !important; border-color: #eae6da; }
+
+/* Phones: the nav pill has no room for the About link at full width, and
+   the hero actions stack instead of forcing both pills onto one tight row. */
+@media (max-width: 480px) {
+    .nav-pill { gap: 0.6rem; padding: 0.5rem 0.5rem 0.5rem 0.9rem; }
+    .nav-link { display: none; }
+    .nav-brand { font-size: 0.72rem; }
+    .nav-cta { font-size: 0.74rem; padding: 0.4rem 0.8rem; }
+    .hero { padding: 7rem 1.25rem 2rem; }
+    .hero-actions { flex-direction: column; gap: 1rem; }
+}
+
+/* About / how-it-works */
+.about {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 5rem 1rem 6rem;
+    scroll-margin-top: 5rem;
+}
+.about h2 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: #eae6da;
+    margin: 0 0 2rem;
+}
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.6rem; }
+.steps li { display: flex; gap: 1.1rem; align-items: flex-start; }
+.step-num {
+    flex-shrink: 0;
+    width: 1.9rem;
+    height: 1.9rem;
+    border: 1px solid rgba(91,122,157,0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: #9fb8d6;
+}
+.steps p { margin: 0.2rem 0 0; color: #a9afc0; line-height: 1.55; }
+.steps strong { color: #eae6da; }
+
+#app-anchor { scroll-margin-top: 5rem; }
+.app-heading {
     font-family: 'IBM Plex Mono', monospace !important;
     font-weight: 600 !important;
-    font-size: 2.6rem !important;
-    letter-spacing: -0.01em;
+    font-size: 1.7rem !important;
     color: #eae6da !important;
-    margin-bottom: 0.3rem !important;
+    margin: 0 0 0.3rem !important;
 }
 [data-testid="stCaptionContainer"] {
     color: #8c93a6 !important;
@@ -215,8 +352,49 @@ h2, h3 { color: #eae6da !important; font-family: 'IBM Plex Mono', monospace !imp
 </style>
 """, unsafe_allow_html=True)
 
-st.title("Is this job real?")
-st.caption("Paste a job posting or a recruiter's message to check it for signs of a scam.")
+st.markdown("""
+<div class="nav-pill">
+    <span class="nav-brand">Fake Job Detector</span>
+    <a href="#about" class="nav-link">About</a>
+    <a href="#app-anchor" class="nav-cta">Check a posting</a>
+</div>
+
+<div class="hero" id="hero">
+    <h1 class="hero-title">Is this job real?</h1>
+    <p class="hero-sub">Paste a posting or a recruiter's message. We'll check it against patterns from real
+    job scams and flag the specific phrases worth a second look.</p>
+    <div class="hero-actions">
+        <a href="#app-anchor" class="hero-cta">Check a posting</a>
+        <a href="#about" class="hero-more">See how it works</a>
+    </div>
+</div>
+
+<div class="about" id="about">
+    <h2>How this works</h2>
+    <ol class="steps">
+        <li>
+            <span class="step-num">1</span>
+            <p><strong>Paste the text.</strong> The full posting or the whole message, not just a snippet
+            &mdash; the model needs context to judge it reliably.</p>
+        </li>
+        <li>
+            <span class="step-num">2</span>
+            <p><strong>See what's flagged.</strong> A model trained on thousands of real job postings scores
+            it, and specific phrases get underlined inline with a plain-language reason.</p>
+        </li>
+        <li>
+            <span class="step-num">3</span>
+            <p><strong>Verify it yourself.</strong> A low score isn't proof. Check the company's real site
+            and talk to your career center before you reply to anything.</p>
+        </li>
+    </ol>
+</div>
+
+<div id="app-anchor"></div>
+""", unsafe_allow_html=True)
+
+st.markdown('<h2 class="app-heading">Check a posting</h2>', unsafe_allow_html=True)
+st.caption("Paste the full text below.")
 
 if not MODEL_PATH.exists():
     st.error("No trained model found. Run `python -m src.model.train` from the repo root, then reload.")
