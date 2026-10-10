@@ -8,6 +8,7 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from background import render_background  # noqa: E402
 from src.model.predict import MODEL_PATH, load_model, predict  # noqa: E402
 
 # Swap for C's rule module once it lands; see redflags_placeholder.py for the contract.
@@ -45,10 +46,14 @@ EXAMPLES = {
     ),
 }
 
+# headline, advice, stamp word, ink color, stamp tilt (degrees)
 VERDICTS = {
-    "high": (st.error, "High risk", "This reads like known job scams. Don't send money or personal details."),
-    "medium": (st.warning, "Some risk", "Parts of this resemble scam postings. Verify the employer independently before replying."),
-    "low": (st.success, "Low risk", "Nothing here matches the scam patterns the model knows. That is not proof it's safe."),
+    "high": ("High risk", "This reads like known job scams. Don't send money or personal details.",
+              "Flagged", "#c1443c", -3),
+    "medium": ("Some risk", "Parts of this resemble scam postings. Verify the employer independently before replying.",
+               "Verify further", "#c98a2c", 2),
+    "low": ("Low risk", "Nothing here matches the scam patterns the model knows. That is not proof it's safe.",
+            "Looks clear", "#4f9169", -1.5),
 }
 
 
@@ -58,13 +63,165 @@ def highlight(text, flags):
         if f["start"] < pos:  # overlapping match; the earlier one already covers it
             continue
         parts.append(html.escape(text[pos:f["start"]]))
-        parts.append(f'<mark title="{html.escape(f["label"])}">{html.escape(text[f["start"]:f["end"]])}</mark>')
+        parts.append(f'<mark class="flag" title="{html.escape(f["label"])}">{html.escape(text[f["start"]:f["end"]])}</mark>')
         pos = f["end"]
     parts.append(html.escape(text[pos:]))
     return "".join(parts).replace("\n", "<br>")
 
 
+def render_verdict(risk):
+    headline, advice, stamp, ink, tilt = VERDICTS[risk]
+    st.markdown(f"""
+    <div class="verdict">
+        <div class="stamp" style="--ink:{ink}; transform:rotate({tilt}deg)">{stamp}</div>
+        <div>
+            <p class="verdict-headline">{headline}.</p>
+            <p class="verdict-advice">{advice}</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+# Case-file theme: ink-navy ground, Plex Mono carrying the display type (a case-file,
+# typewritten register rather than a marketing serif), verdicts rendered as rotated ink
+# stamps, and flagged phrases underlined like a reviewer's redaction marks instead of
+# highlighter yellow. The drifting node graph behind everything (app/frontend) stands
+# in for a fraud ring's link analysis, not decoration for its own sake.
 st.set_page_config(page_title="Fake Job Detector", page_icon="🔎")
+render_background()
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+html, body, [class*="css"] { font-family: 'IBM Plex Sans', sans-serif; }
+
+/* The theme's navy fill lands on stApp (position:absolute, paints above our
+   fixed/negative-z-index background div regardless of DOM nesting) -- every
+   ancestor down to stAppViewContainer has to be transparent, not just the one
+   that visually "looks like" the page background. */
+html, body,
+[data-testid="stApp"],
+[data-testid="stAppViewContainer"] { background: transparent !important; }
+[data-testid="stHeader"] { background: transparent; }
+[data-testid="stMainBlockContainer"] { padding-top: 3.5rem; max-width: 700px; }
+
+/* Hero */
+h1 {
+    font-family: 'IBM Plex Mono', monospace !important;
+    font-weight: 600 !important;
+    font-size: 2.6rem !important;
+    letter-spacing: -0.01em;
+    color: #eae6da !important;
+    margin-bottom: 0.3rem !important;
+}
+[data-testid="stCaptionContainer"] {
+    color: #8c93a6 !important;
+    font-size: 1rem !important;
+}
+
+/* Example tabs -- folder-tab feel: flat top edge, no uppercase tracking */
+[data-testid="stButton"] button {
+    background: rgba(234,230,218,0.04) !important;
+    border: 1px solid rgba(234,230,218,0.16) !important;
+    border-radius: 6px 6px 0 0 !important;
+    color: #c7cbd6 !important;
+    font-family: 'IBM Plex Mono', monospace !important;
+    font-size: 0.82rem !important;
+    padding: 0.5rem 0.9rem !important;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+[data-testid="stButton"] button:hover {
+    border-color: #5b7a9d !important;
+    color: #9fb8d6 !important;
+}
+
+/* Paste box */
+[data-testid="stTextAreaRootElement"] {
+    background: #10172a !important;
+    border: 1px solid rgba(234,230,218,0.14) !important;
+    border-radius: 4px !important;
+}
+[data-testid="stTextAreaRootElement"] textarea {
+    color: #eae6da !important;
+    font-size: 0.96rem !important;
+}
+[data-testid="stWidgetLabel"] p {
+    color: #8c93a6 !important;
+    font-size: 0.88rem !important;
+}
+
+/* Verdict stamp */
+.verdict {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    padding: 1rem 0.2rem;
+    margin: 0.4rem 0 1.2rem;
+    border-top: 1px solid rgba(234,230,218,0.14);
+    border-bottom: 1px solid rgba(234,230,218,0.14);
+}
+.verdict .stamp {
+    flex-shrink: 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: 0.92rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    border: 3px double var(--ink);
+    border-radius: 5px;
+    padding: 0.45rem 0.8rem;
+    white-space: nowrap;
+    user-select: none;
+}
+.verdict-headline { color: #eae6da; font-weight: 600; font-size: 1.05rem; margin: 0; }
+.verdict-advice { color: #a9afc0; font-size: 0.92rem; margin: 0.15rem 0 0; }
+
+[data-testid="stAlertContainer"] {
+    border-radius: 6px !important;
+    border: 1px solid rgba(91,122,157,0.35) !important;
+    background: rgba(91,122,157,0.1) !important;
+}
+[data-testid="stAlertContentInfo"] { color: #a9bdd6 !important; }
+
+/* Metrics */
+[data-testid="stMetricLabel"] p { color: #8c93a6 !important; font-size: 0.82rem !important; }
+[data-testid="stMetricValue"] {
+    color: #eae6da !important;
+    font-family: 'IBM Plex Mono', monospace !important;
+    font-weight: 600 !important;
+}
+
+/* Flagged phrases: a reviewer's underline, not a highlighter */
+mark.flag {
+    background: transparent;
+    color: inherit;
+    border-bottom: 2px solid #c98a2c;
+    padding: 0;
+}
+
+h2, h3 { color: #eae6da !important; font-family: 'IBM Plex Mono', monospace !important; font-weight: 600 !important; }
+[data-testid="stMarkdownContainer"] p, [data-testid="stMarkdownContainer"] li { color: #c7cbd6; }
+[data-testid="stMarkdownContainer"] strong { color: #eae6da; }
+
+/* Pin the R3F background iframe (app/background.py) full-bleed behind everything */
+[data-testid="stElementContainer"]:has(> iframe) {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: -1 !important;
+    overflow: visible !important;
+}
+[data-testid="stElementContainer"]:has(> iframe) iframe {
+    width: 100vw !important;
+    height: 100vh !important;
+    border: none !important;
+    pointer-events: none !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 st.title("Is this job real?")
 st.caption("Paste a job posting or a recruiter's message to check it for signs of a scam.")
 
@@ -82,8 +239,7 @@ text = st.text_area("Posting or message", key="text", height=220, placeholder="P
 if text.strip():
     score, risk = predict(text)
     flags = find_red_flags(text)
-    banner, headline, advice = VERDICTS[risk]
-    banner(f"**{headline}.** {advice}")
+    render_verdict(risk)
 
     left, right = st.columns(2)
     left.metric("Model's fraud estimate", f"{score:.0%}")
