@@ -1,0 +1,26 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# large/raw data — don't commit the actual dataset
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*.csv
+!data/processed/.gitkeep
+
+# model artifacts
+*.pkl
+*.joblib
+*.pt
+*.bin
+
+# notebooks checkpoints
+.ipynb_checkpoints/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
