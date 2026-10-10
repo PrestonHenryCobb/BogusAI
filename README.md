@@ -34,6 +34,6 @@ Place `fake_job_postings.csv` (EMSCAD, from the Kaggle "Real or Fake: Fake Job P
 
 ```bash
 python -m src.pipeline.build_splits     # dedupe + group split -> data/processed/splits.json
-python -m src.model.train               # trains tiers A-C
+python -m src.model.train               # trains tiers A-C and E
 streamlit run app/main.py               # demo UI
 ```
