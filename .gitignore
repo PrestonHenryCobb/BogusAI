@@ -8,9 +8,9 @@ venv/
 data/processed/*.csv
 !data/processed/.gitkeep
 
-# raw third-party downloads and caches (CFPB bulk file, LinkedIn postings, Reddit text);
-# rebuild with `python -m src.realworld.build`. Only IDs, labels and public-domain
-# subsets are committed under data/realworld/.
+# raw third-party downloads and caches (LinkedIn postings, Reddit text); rebuild with
+# the commands in docs/REALWORLD_DATA.md. Only IDs, labels and splits are committed
+# under data/realworld/.
 data/external/
 
 # model artifacts — regenerate with `python -m src.model.train`
