@@ -1,6 +1,10 @@
 [browser]
 gatherUsageStats = false
 
+[client]
+# The site's own nav links every page; Streamlit's sidebar page list is hidden.
+showSidebarNavigation = false
+
 [server]
 enableXsrfProtection = true
 maxUploadSize = 1
