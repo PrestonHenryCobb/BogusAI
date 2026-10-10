@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from background import render_background  # noqa: E402
 from theme import apply_theme, page_html, render_nav  # noqa: E402
 from src.model.predict import MODEL_PATH, load_model, predict  # noqa: E402
+from src.model.verdict import combined_risk  # noqa: E402
 from src.redflags import MAX_CHARS, find_red_flags  # noqa: E402
 from src.redflags.render import highlight_html  # noqa: E402
 
@@ -626,7 +627,8 @@ with st.container(key="tool"):
     st.caption("Nothing you paste is saved or logged by this app. Still, don't paste real SSNs, bank details or IDs.")
 
     if text.strip():
-        score, risk = predict(text)
+        score, model_risk = predict(text)
+        risk = combined_risk(model_risk, text)
         flags = find_red_flags(text)
         render_verdict(risk)
 

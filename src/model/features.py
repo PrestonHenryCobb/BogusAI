@@ -39,7 +39,11 @@ TIERS = {
     "C-noshortcut": (True, True, True),
     "D": (False, True, False),  # fine-tuned DistilBERT, see bert.py
     "E": (False, True, False),  # tier B + C's red-flag rule indicators
+    "F": (False, True, False),  # tier B trained with short windows + real modern data (src/realworld/augment.py)
+    "FE": (False, True, False),  # tier E trained the same way as F
 }
+# Tiers whose training folds get src.realworld.augment.training_extras appended.
+AUGMENTED_TIERS = ["F", "FE"]
 # Not trained unless asked for: slow, and needs requirements-bert.txt.
 OPTIONAL_TIERS = ["D"]
 
@@ -97,7 +101,7 @@ def make_pipeline(tier):
         tfidf = TfidfVectorizer(ngram_range=(1, 2), min_df=3, max_features=100_000,
                                 sublinear_tf=True, stop_words="english")
         transformers.append(("tfidf", tfidf, "text"))
-    if tier == "E":
+    if tier in ("E", "FE"):
         transformers.append(("redflags", FunctionTransformer(redflag_matrix), "text"))
     return Pipeline([
         ("features", ColumnTransformer(transformers)),

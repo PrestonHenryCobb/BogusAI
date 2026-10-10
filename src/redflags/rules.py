@@ -14,7 +14,8 @@ RULES = [
     (
         "Upfront payment",
         _any(
-            r"(?:registration|training|application|processing|activation|placement|credential|sign-?up|setup|entry|starter kit|equipment)\s+fee",
+            # "...will not be obligated to pay a placement fee" is employer boilerplate aimed at agencies.
+            r"(?<!obligated to pay a )(?<!responsible for any )(?:registration|training|application|processing|activation|placement|credential|sign-?up|setup|entry|starter kit|equipment)\s+fee",
             # "processing payments" is a common legit duty, so processing only counts with a price or "pay the".
             r"(?:registration|training|application|activation|placement|credential|sign-?up|setup|entry|starter kit|equipment)\s+(?:charge|payment|amount)\b",
             r"(?:\$\d[\d,]*|pay\s+the)\s+processing\s+(?:charge|payment)\b",
@@ -31,9 +32,11 @@ RULES = [
         "Check or money forwarding",
         _any(
             r"(deposit|cash)\s+(the|a|this|it)?\s*check",
-            r"\b(?:pay)?check\b.{0,100}?\b(?:send|return|wire|transfer|forward)\w*\b.{0,60}?" + _LEFTOVER,
+            # Verb forms only: "check sales, returns and exchanges ... daily balance" is a cashier's duty list.
+            r"\b(?:pay)?check\b.{0,100}?\b(?:send\w*|return(?:ing|ed)?|wire[ds]?|wiring|transfer\w*|forward\w*)\b.{0,60}?" + _LEFTOVER,
             r"send\s+(back\s+)?the\s+(remainder|rest|difference)",
-            r"western union|moneygram|zelle|wire transfer",
+            # Bank roles list "wire transfers and collections" as duties; only sending money by wire counts.
+            r"western union|moneygram|zelle|(?:send|pay|via|by|through)\s+(?:a\s+|the\s+)?wire transfer",
             r"(?:buy|purchase|get)\s+(?:[\w-]+\s+){0,3}" + _GIFT_CARD,
             r"(?:send|pay\s+for)\s+(?:the\s+)?gift cards?",
             r"\b(?:pay|settle)\b.{0,60}?\bwith\s+(?:[\w-]+\s+){0,2}" + _GIFT_CARD,
@@ -53,7 +56,9 @@ RULES = [
     (
         "Sensitive details too early",
         _any(
-            r"bank (details|account|information|login|password)|routing number",
+            # Asked for, not mentioned: "reconcile bank accounts" is an accounting duty.
+            r"\b(?:send|provide|share|submit|give|text|email|enter|need|require)\w*\b.{0,40}?\bbank (?:details|information|login|password|accounts?)\b",
+            r"\byour\s+(?:[\w-]+\s+){0,2}bank (?:details|account|information|login|password)|\byour\s+routing number",
             r"copy of your (id|passport|driver)",
             r"(?:photo|picture|image|scan)\s+of\s+(?:your|their|an?)\s+(?:id|passport|driver)",
             r"\b(?:id|passport)\s+(?:image|scan|photo|picture)",

@@ -19,8 +19,17 @@ from sklearn.metrics import (average_precision_score, brier_score_loss, precisio
                              precision_score, recall_score, roc_auc_score)
 
 from src.model.data import LABEL_COL, RAW_CSV, ROOT, SPLITS_JSON, dev_splits, load_postings, load_splits
-from src.model.features import OPTIONAL_TIERS, TIERS, build_frame, make_pipeline
+from src.model.features import AUGMENTED_TIERS, OPTIONAL_TIERS, TIERS, build_frame, make_pipeline
 from src.model.predict import FraudModel, apply_calibrator, fit_calibrator
+
+
+def fit(tier, X, y):
+    """Fit a tier; augmented tiers also see extra rows, built from the training rows only."""
+    if tier in AUGMENTED_TIERS:
+        from src.realworld.augment import training_extras
+        X_extra, y_extra = training_extras(X, y)
+        X, y = pd.concat([X, X_extra]), pd.concat([y, y_extra])
+    return make_pipeline(tier).fit(X, y)
 
 
 def oof_scores(tier, X, y, fold_positions):
@@ -28,7 +37,7 @@ def oof_scores(tier, X, y, fold_positions):
     everything = np.arange(len(X))
     for val in fold_positions:
         train = np.setdiff1d(everything, val)
-        pipe = make_pipeline(tier).fit(X.iloc[train], y.iloc[train])
+        pipe = fit(tier, X.iloc[train], y.iloc[train])
         scores[val] = pipe.predict_proba(X.iloc[val])[:, 1]
     return scores
 
@@ -53,7 +62,7 @@ def train_tier(tier, X, y, fold_positions, X_test, y_test, args):
         raw_val, y_val = pipeline.predict_proba(X.iloc[val])[:, 1], y.iloc[val]
     else:
         raw_val, y_val = oof_scores(tier, X, y, fold_positions), y
-        pipeline = make_pipeline(tier).fit(X, y)
+        pipeline = fit(tier, X, y)
     calibrator = fit_calibrator(args.calibration, raw_val, y_val)
     cal_val = apply_calibrator(calibrator, raw_val)
     threshold = pick_threshold(y_val, cal_val, args.precision_target)
