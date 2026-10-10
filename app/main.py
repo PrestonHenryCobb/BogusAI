@@ -8,6 +8,7 @@ import streamlit as st
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.model.predict import MODEL_PATH, load_model, predict  # noqa: E402
+from src.model.verdict import combined_risk  # noqa: E402
 from src.redflags import MAX_CHARS, find_red_flags  # noqa: E402
 from src.redflags.render import highlight_html  # noqa: E402
 
@@ -68,7 +69,8 @@ text = st.text_area("Posting or message", key="text", height=220, max_chars=MAX_
 st.caption("Nothing you paste is saved or logged by this app. Still, don't paste real SSNs, bank details or IDs.")
 
 if text.strip():
-    score, risk = predict(text)
+    score, model_risk = predict(text)
+    risk = combined_risk(model_risk, text)
     flags = find_red_flags(text)
     banner, headline, advice = VERDICTS[risk]
     banner(f"**{headline}.** {advice}")
