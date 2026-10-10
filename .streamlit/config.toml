@@ -1,6 +1,18 @@
 [browser]
 gatherUsageStats = false
 
+[client]
+# The site's own nav links every page; Streamlit's sidebar page list is hidden.
+showSidebarNavigation = false
+
 [server]
 enableXsrfProtection = true
 maxUploadSize = 1
+
+[theme]
+base = "dark"
+primaryColor = "#d0912f"
+backgroundColor = "#080b13"
+secondaryBackgroundColor = "#0f1320"
+textColor = "#ece8df"
+font = "sans serif"
