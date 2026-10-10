@@ -44,12 +44,18 @@ streamlit run app/main.py               # demo UI
 
 The dithered wave behind the UI ([react-bits](https://reactbits.dev)'s `Dither`) is a small
 React + three.js (`@react-three/fiber`, `@react-three/postprocessing`) scene, built to one
-self-contained `dist/index.html` and embedded via `app/background.py` using
-`st.components.v1.html`. The built file is committed, so running the demo needs no Node
-install. Only rebuild it if you edit `app/frontend/src`:
+self-contained `app/static/background/index.html` and embedded via `app/background.py`
+using `st.iframe(url, ...)` -- a real `src=` iframe served by Streamlit's static file
+server (`enableStaticServing` in `.streamlit/config.toml`), not an inlined `srcdoc`.
+That distinction isn't cosmetic: `srcdoc` sandboxed iframes were silently freezing
+three.js's render loop (requestAnimationFrame and useFrame both kept firing, but the
+canvas's actual pixels never changed) -- a real `src=` iframe avoids that.
+
+The built file is committed, so running the demo needs no Node install. Only rebuild it
+if you edit `app/frontend/src`:
 
 ```bash
 cd app/frontend
 npm install
-npm run build        # writes dist/index.html -- commit the result
+npm run build        # writes app/static/background/index.html -- commit the result
 ```
