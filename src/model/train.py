@@ -27,8 +27,10 @@ def fit(tier, X, y):
     """Fit a tier; augmented tiers also see extra rows, built from the training rows only."""
     if tier in AUGMENTED_TIERS:
         from src.realworld.augment import training_extras
-        X_extra, y_extra = training_extras(X, y)
+        X_extra, y_extra, w_extra = training_extras(X, y)
+        weights = np.concatenate([np.ones(len(X)), w_extra])
         X, y = pd.concat([X, X_extra]), pd.concat([y, y_extra])
+        return make_pipeline(tier).fit(X, y, clf__sample_weight=weights)
     return make_pipeline(tier).fit(X, y)
 
 
