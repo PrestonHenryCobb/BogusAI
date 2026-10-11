@@ -153,8 +153,15 @@ pops up.
 
 - **Quiet scams:** the banner shows the higher of the model's risk and the
   red-flag rules' risk, so a scam the model scores low can still read high.
-  Rules only fire on explicit phrasing, and the model was trained on 2012-2014
+  Rules only fire on explicit phrasing, and the model learned mostly from older
   postings, so a scam with neither pattern can still read low.
-- **Model files are pickles:** only load a `model.joblib` you trained yourself.
-- **Dependencies are unpinned** and the EMSCAD CSV is committed to this repo.
-  Both are called out in the security review and need a team decision.
+- **Model files are pickles:** `models/model.joblib`, `model_B.joblib` and `model_F.joblib`
+  are committed, so anyone with write access to `main` can change what the app loads.
+  Run `python -m src.model.verify_models` after pulling; it checks them against
+  `models/SHA256SUMS`, which is reviewed in git. After retraining on purpose, run
+  `python -m src.model.verify_models --update` and commit both together. Only load a
+  model file that came from the repo or from a teammate directly.
+- **scikit-learn is pinned to 1.7.1** to match how the committed models were saved.
+- **Only scikit-learn is pinned;** the other dependencies are `>=`. The EMSCAD CSV is
+  also committed to this repo, which matters if the repo is made public. Both need a
+  team decision.

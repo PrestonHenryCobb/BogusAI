@@ -20,6 +20,7 @@ models/*
 !models/model.joblib
 !models/model_B.joblib
 !models/model_F.joblib
+!models/SHA256SUMS
 
 # notebooks checkpoints
 .ipynb_checkpoints/

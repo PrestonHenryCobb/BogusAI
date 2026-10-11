@@ -2,17 +2,17 @@
 
 ## Status and composition
 
-This is a synthetic draft of the modern job-scam challenge set, 202 rows. Rows
-are single sentences (77-155 characters), much shorter than EMSCAD postings.
+This is a synthetic draft of the modern job-scam challenge set, 208 rows. Rows
+are one or two sentences (77-231 characters), much shorter than EMSCAD postings.
 
 | Category | Rows | Positive label |
 |---|---:|---:|
 | Scam, including 20 paraphrases | 80 | 1 |
 | Legitimate-job archetypes (60 postings, 20 recruiter messages) | 80 | 0 |
-| Hard-negative archetypes (30 postings, 12 recruiter messages) | 42 | 0 |
-| **Total** | **202** | |
+| Hard-negative archetypes (34 postings, 14 recruiter messages) | 48 | 0 |
+| **Total** | **208** | |
 
-Surface: 137 postings, 65 recruiter messages (33 scam, 32 non-scam), so message
+Surface: 141 postings, 67 recruiter messages (33 scam, 34 non-scam), so message
 vs posting is not a label shortcut. Each paraphrase has `paraphrase_of` set to
 its original scam row ID. Every row has `author=claude` and
 `review=claude-second-pass-2026-10-10`: a second pass by Claude, not a human
@@ -57,15 +57,17 @@ unbiased estimates of real-world performance. The paraphrases are only a small
 robustness probe and should be excluded from any independent aggregate score
 unless results are also reported separately by original and paraphrase.
 
-No trained `models/model.joblib` was available when this draft was assembled, so
-model evaluation has not been run. The CSV is a draft, not a validated or
-production-ready benchmark.
+HARD-043 to HARD-048 (paid crowd-work and task gigs: voice recordings, survey
+panels, data annotation, app testing) were added on 2026-10-11 after tier F flagged
+real crowd-work postings in the live-posting eval. They were written after seeing that
+failure, so they are not independent of it, and they were never used for training.
+The CSV is a draft, not a validated or production-ready benchmark.
 
 ## Checks run on this version
 
 **Model (tier B, trained from `main` with `python -m src.model.train`, thresholds
-from EMSCAD).** On all 202 rows: ROC-AUC 0.60, PR-AUC 0.53, high-risk recall 0.10,
-high-risk precision 0.73, 51% of scams rated low. For comparison EMSCAD test
+from EMSCAD).** On all 208 rows: ROC-AUC 0.60, PR-AUC 0.51, high-risk recall 0.10,
+high-risk precision 0.67, 51% of scams rated low. For comparison EMSCAD test
 ROC-AUC is 0.99. This is the EMSCAD-vs-challenge-set gap. Part of it is the
 short single-sentence format, not only scam patterns; treat the headline number
 with that caveat.
@@ -121,20 +123,27 @@ loss is in-sample, not evidence of robustness. Model rows are the independent ch
 `python -m src.model.evaluate data/challenge_set/challenge_set.csv --model models/model_<tier>.joblib`,
 thresholds from each artifact (chosen on EMSCAD):
 
-| Metric (202 rows, 80 scams) | Tier B | Tier F |
+| Metric (208 rows, 80 scams) | Tier B | Tier F |
 |---|---:|---:|
-| ROC-AUC | 0.60 | 0.83 |
-| PR-AUC | 0.53 | 0.77 |
+| ROC-AUC | 0.60 | 0.82 |
+| PR-AUC | 0.51 | 0.70 |
 | Scams rated high risk | 10% | 41% |
 | Scams rated low risk | 51% | 15% |
-| Precision at high | 0.73 | 0.83 |
-| Non-scam rows rated high | 2.5% | 5.7% |
+| Precision at high | 0.67 | 0.79 |
+| Non-scam rows rated high | 3.1% | 7.0% |
+| Hard negatives rated high (48) | 4% | 10% |
 
 F closes much of the gap but is not a clean win: more legitimate rows are rated high.
+The new crowd-work rows show where: F rates 2 of those 6 high (an app-testing invite
+that says "reply YES", and a survey panel that cashes out to a gift card), against 1 for B.
+On live postings, 4 of the 5 that F + rules flags high are one employer's voice-recording
+crowd-work tasks. Task-based legitimate work looks like a task scam to a model trained on
+Reddit task-scam messages.
+
 All numbers use the model alone; the app also applies the red-flag rules. The challenge
 set is single-writer and was used to write the rules, so treat it as an optimistic
-estimate. Tier F models in `models/` were saved with scikit-learn 1.7.1 and load under
-1.9.1 with a version warning; pin the version before relying on them.
+estimate. `requirements.txt` now pins scikit-learn 1.7.1, the version the committed
+models were saved with; results are identical under 1.9.1 but it warns.
 
 ## Encoding fix
 

@@ -1,5 +1,5 @@
 numpy>=1.26
 pandas>=2.1
-scikit-learn>=1.4
+scikit-learn==1.7.1  # committed models/*.joblib were saved with 1.7.1; other versions warn and may differ
 joblib>=1.3
 streamlit>=1.36
