@@ -112,8 +112,8 @@ any = medium or high). Run on 2026-10-11 with the committed models (`models/`):
 Tier F catches twice as many originals as B, and loses about as many on rewording
 (its remaining misses are "refundable ... activation charge" for "fee", "sign-up
 amount" for "registration", and a Telegram move worded as "avoid contacting the
-office"). Tier C and tier FE are not shown: C's numbers come from the missing-metadata
-shortcut, and no FE artifact is committed.
+office"). Tier C is not shown: its numbers come from the missing-metadata shortcut. Tier FE
+will not be used, so only B and F are compared.
 
 Read with care: the rules were written while looking at these rows, so their zero
 loss is in-sample, not evidence of robustness. Model rows are the independent check.

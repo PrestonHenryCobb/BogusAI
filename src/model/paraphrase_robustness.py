@@ -1,7 +1,7 @@
 """Paraphrase robustness: is a reworded scam caught as often as the original?
 
     python -m src.model.paraphrase_robustness
-    python -m src.model.paraphrase_robustness --models B F FE --show 10
+    python -m src.model.paraphrase_robustness --models B F --show 10
 
 Reads the challenge set, pairs each paraphrase row with its original through
 `paraphrase_of`, and scores both with the red-flag rules and each trained model
