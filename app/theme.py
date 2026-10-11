@@ -1,9 +1,14 @@
 """Shared look for every page: tokens, fonts, background pinning, nav, buttons and
 Streamlit widget styling. Page-specific sections and motion stay in each page."""
 
+import base64
 import re
+from pathlib import Path
 
 import streamlit as st
+
+BRAND = "BogusAI"
+LOGO = Path(__file__).parent / "assets" / "BogusAI-2.svg"
 
 BASE_CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;700&display=swap');
@@ -121,7 +126,7 @@ a:focus-visible, summary:focus-visible, button:focus-visible {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    padding: 0.45rem 0.45rem 0.45rem 1.1rem;
+    padding: 0.6rem 0.6rem 0.6rem 1.8rem;
     border-radius: 999px;
     background: rgba(15,19,32,0.55);
     backdrop-filter: blur(18px) saturate(160%);
@@ -134,19 +139,19 @@ a:focus-visible, summary:focus-visible, button:focus-visible {
 .st-key-page h1 { font-family: var(--serif) !important; font-weight: 400 !important; letter-spacing: -0.015em; color: var(--paper) !important; font-size: clamp(2.2rem, 4.4vw, 3.4rem) !important; line-height: 1.08 !important; }
 .st-key-page [data-testid="stMarkdownContainer"] p { color: #c4c9d4; line-height: 1.6; }
 .st-key-page [data-testid="stExpander"] details { border: 1px solid var(--line) !important; border-radius: 12px !important; background: var(--panel); }
-.brand-mark {
-    width: 1.05rem; height: 1.05rem; border-radius: 3px;
-    border: 1.5px double var(--red); transform: rotate(-8deg);
-}
-.nav-links { display: flex; gap: 1.8rem; }
+.brand-logo { height: 1.45rem; width: auto; display: block; }
+/* The file's box includes room for the g's tail, so the capitals sit high; nudge them onto the bar's centre line. */
+.nav .brand-logo { height: 2.15rem; transform: translateY(0.2rem); }
+.nav-links { display: flex; gap: 2rem; }
 .nav-links a, .nav-actions .ghost {
     color: var(--muted) !important;
     text-decoration: none !important;
-    font-size: 0.86rem;
+    font-size: 0.94rem;
     transition: color 0.15s ease;
 }
 .nav-links a:hover { color: var(--paper) !important; }
 .nav-actions { display: flex; justify-content: flex-end; }
+.nav .btn-sm { min-height: 2.45rem; padding: 0 1.15rem; font-size: 0.9rem; }
 
 .btn {
     display: inline-flex;
@@ -236,12 +241,18 @@ def apply_theme():
     st.markdown(f"<style>{BASE_CSS}</style>", unsafe_allow_html=True)
 
 
+def brand_html():
+    """The wordmark as an inline image, so it needs no static file serving."""
+    data = base64.b64encode(LOGO.read_bytes()).decode()
+    return f'<img class="brand-logo" src="data:image/svg+xml;base64,{data}" alt="{BRAND}">'
+
+
 def render_nav(skip_target="#check"):
     links = "".join(f'<a href="{href}" target="_self">{label}</a>' for label, href in NAV_LINKS)
     page_html(f"""
     <a class="skip" href="{skip_target}">Skip to main content</a>
     <nav class="nav" aria-label="Main">
-        <a class="brand" href="./" target="_self" translate="no"><span class="brand-mark" aria-hidden="true"></span>Fake Job Detector</a>
+        <a class="brand" href="./" target="_self" translate="no">{brand_html()}</a>
         <div class="nav-links">{links}</div>
         <div class="nav-actions"><a class="btn btn-solid btn-sm" href="./#check" target="_self">Check a posting</a></div>
     </nav>
