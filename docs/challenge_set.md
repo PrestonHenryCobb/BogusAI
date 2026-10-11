@@ -94,6 +94,48 @@ Known remaining limits: every row is one sentence by one writer, scam rows are
 more often third-person narration ("A recruiter asks...") than real postings,
 and the red-flag rules were tuned on this set.
 
+## Paraphrase robustness
+
+`python -m src.model.paraphrase_robustness` pairs each of the 20 paraphrase rows
+with its original and compares how often each is caught (high = rated high risk,
+any = medium or high). Run on 2026-10-11 with the committed models (`models/`):
+
+| Method | Originals high | Paraphrases high | Lost (high) | Originals any | Paraphrases any |
+|---|---:|---:|---:|---:|---:|
+| Rules | 17/20 | 17/20 | 0 | 20/20 | 20/20 |
+| Tier B | 4/20 | 2/20 | 3 | 11/20 | 9/20 |
+| Tier F | 8/20 | 6/20 | 4 | 16/20 | 15/20 |
+
+"Lost" counts pairs where the original was rated high and its paraphrase was not.
+Tier F catches twice as many originals as B, and loses about as many on rewording
+(its remaining misses are "refundable ... activation charge" for "fee", "sign-up
+amount" for "registration", and a Telegram move worded as "avoid contacting the
+office"). Tier C and tier FE are not shown: C's numbers come from the missing-metadata
+shortcut, and no FE artifact is committed.
+
+Read with care: the rules were written while looking at these rows, so their zero
+loss is in-sample, not evidence of robustness. Model rows are the independent check.
+
+## Model results on this set
+
+`python -m src.model.evaluate data/challenge_set/challenge_set.csv --model models/model_<tier>.joblib`,
+thresholds from each artifact (chosen on EMSCAD):
+
+| Metric (202 rows, 80 scams) | Tier B | Tier F |
+|---|---:|---:|
+| ROC-AUC | 0.60 | 0.83 |
+| PR-AUC | 0.53 | 0.77 |
+| Scams rated high risk | 10% | 41% |
+| Scams rated low risk | 51% | 15% |
+| Precision at high | 0.73 | 0.83 |
+| Non-scam rows rated high | 2.5% | 5.7% |
+
+F closes much of the gap but is not a clean win: more legitimate rows are rated high.
+All numbers use the model alone; the app also applies the red-flag rules. The challenge
+set is single-writer and was used to write the rules, so treat it as an optimistic
+estimate. Tier F models in `models/` were saved with scikit-learn 1.7.1 and load under
+1.9.1 with a version warning; pin the version before relying on them.
+
 ## Encoding fix
 
 An earlier draft had apostrophes and quoted source titles replaced by `?` (9 text
