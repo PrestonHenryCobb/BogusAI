@@ -13,8 +13,13 @@ data/processed/*.csv
 # under data/realworld/.
 data/external/
 
-# model artifacts — regenerate with `python -m src.model.train`
-models/
+# model artifacts: the demo model and the two the comparisons use are committed so the
+# whole team runs the same ones without retraining (5 MB each). Everything else in
+# models/ (other tiers, reports) stays local; regenerate with `python -m src.model.train`.
+models/*
+!models/model.joblib
+!models/model_B.joblib
+!models/model_F.joblib
 
 # notebooks checkpoints
 .ipynb_checkpoints/
