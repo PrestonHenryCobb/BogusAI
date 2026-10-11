@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from background import render_background  # noqa: E402
 from theme import BRAND, apply_theme, brand_html, page_html, render_nav  # noqa: E402
 from src.model.predict import MODEL_PATH, load_model, predict  # noqa: E402
-from src.model.verdict import combined_risk  # noqa: E402
+from src.model.verdict import combined_risk, display_risk  # noqa: E402
 from src.redflags import MAX_CHARS, find_red_flags  # noqa: E402
 from src.redflags.render import highlight_html  # noqa: E402
 
@@ -54,6 +54,9 @@ VERDICTS = {
                "Verify further", "#d0912f", 2),
     "low": ("Low risk", "Nothing here matches the scam patterns the model knows. That is not proof it's safe.",
             "Looks clear", "#5fa37a", -1.5),
+    # Not a risk level: shown instead of "low" when there is too little text to call it.
+    "short": ("Too short to judge", "There isn't enough text to check. Paste the full posting or the whole conversation.",
+              "Need more", "#7d9cc4", 0),
 }
 
 
@@ -624,18 +627,18 @@ with st.container(key="tool"):
             st.session_state["text"] = EXAMPLES[name]
 
     text = st.text_area("Posting or message", key="text", height=220, placeholder="Paste the full text here…", max_chars=MAX_CHARS)
-    st.caption("Nothing you paste is saved or logged by this app. Still, don't paste real SSNs, bank details or IDs.")
+    st.caption("This app doesn't save or log what you paste. Still, don't paste real SSNs, bank details or IDs.")
 
     if text.strip():
         score, model_risk = predict(text)
-        risk = combined_risk(model_risk, text)
+        risk = display_risk(combined_risk(model_risk, text), text, MIN_WORDS)
         flags = find_red_flags(text)
         render_verdict(risk)
 
         left, right = st.columns(2)
         left.metric("Model's fraud estimate", f"{score:.0%}")
         right.metric("Red flags found", len(flags))
-        if len(text.split()) < MIN_WORDS:
+        if risk != "short" and len(text.split()) < MIN_WORDS:
             st.info(f"This is under {MIN_WORDS} words, which is too little text for the model to judge reliably. "
                     "Paste the full posting or the whole conversation if you can.")
 
@@ -718,8 +721,17 @@ page_html("""
                 early requests for bank or ID details, and pay that's too good for the work described.</p>
             </details>
             <details>
+                <summary>What can't it catch?</summary>
+                <p>Scams inside images or PDFs, offers that have been heavily reworded or disguised, and anything
+                under about 15 words. It learned mostly from older postings, so newer tricks can get
+                through. Treat a clear result as "nothing known found", then check the employer yourself.
+                <a href="./Then_vs_now" target="_self">See how it does on modern scams</a>.</p>
+            </details>
+            <details>
                 <summary>Does it save what I paste?</summary>
-                <p>No. Your text is scored in memory and isn't written anywhere.</p>
+                <p>This app doesn't. Your text is scored in memory and the app doesn't write it anywhere. If it's
+                running on a hosted service, that service has its own logs, so don't paste real SSNs, bank
+                details or IDs.</p>
             </details>
             <details>
                 <summary>I think I've been scammed. What now?</summary>

@@ -13,3 +13,14 @@ ORDER = {"low": 0, "medium": 1, "high": 2}
 
 def combined_risk(model_risk, text):
     return max(model_risk, rule_risk(text), key=ORDER.__getitem__)
+
+
+def display_risk(risk, text, min_words):
+    """What the banner shows: the risk level, or "short" when there is too little text to call it low.
+
+    A short text that raised nothing is not evidence of safety; the model misses most fraud under
+    ~15 words. Medium and high are shown as they are, since something specific was found.
+    """
+    if risk == "low" and len(text.split()) < min_words:
+        return "short"
+    return risk

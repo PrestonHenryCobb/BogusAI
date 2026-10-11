@@ -40,7 +40,7 @@ git checkout main && git pull
 | Command | Expected |
 |---|---|
 | `python -m unittest tests.test_redflags tests.test_security` | `Ran 26 tests ... OK` |
-| `python tests/app_smoke.py` | 9 lines starting `PASS`, exit code 0 |
+| `python tests/app_smoke.py` | 13 lines starting `PASS`, exit code 0 |
 | `streamlit run app/main.py` | opens http://localhost:8501 |
 
 If a test fails, don't demo that protection; tell the team which line failed.
@@ -105,11 +105,14 @@ handled. Normalization only helps against character-level tricks.
 
 ## 6. Privacy and telemetry
 
-**What it does.** The app shows "Nothing you paste is saved or logged by this
-app", and Streamlit's usage telemetry is off in `.streamlit/config.toml`. The app
+**What it does.** The app shows "This app doesn't save or log what you paste",
+and Streamlit's usage telemetry is off in `.streamlit/config.toml`. The app
 has no database, logging, or file writes.
 
 **Automatic.** `app_smoke.py` checks the notice is shown and telemetry is off.
+
+The FAQ also says the hosting service has its own logs, so don't paste real SSNs
+or bank details.
 
 **Live demo.** Point at the caption under the text box. If asked: "Run it
 locally for the demo. If it were hosted, pasted text would pass through the
