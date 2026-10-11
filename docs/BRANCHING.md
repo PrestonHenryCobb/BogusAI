@@ -1,6 +1,6 @@
 # Branching strategy
 
-Yes — with 4 people editing overlapping areas (A's split format, B's model, C's data files, D's app) under time pressure, working directly on `main` will produce constant merge conflicts and the risk of someone pushing a broken pipeline right before a demo rehearsal. Use short-lived feature branches, not a heavyweight flow like GitFlow — this is a 48-hour project, not a maintained product.
+Yes — with several people editing overlapping areas (A's split format, B's model, C's data files, D's app) under time pressure, working directly on `main` will produce constant merge conflicts and the risk of someone pushing a broken pipeline right before a demo rehearsal. Use short-lived feature branches, not a heavyweight flow like GitFlow — this is a 48-hour project, not a maintained product.
 
 ## Rules
 

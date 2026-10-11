@@ -1,4 +1,4 @@
-# Labor division (4 people, 48 hours)
+# Labor division (four roles, 48 hours)
 
 ## Why it's split this way
 
