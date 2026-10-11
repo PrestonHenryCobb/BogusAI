@@ -23,8 +23,16 @@ import pandas as pd
 from src.model.features import build_frame
 from src.realworld.dataset import load, snippet
 
-WINDOWS_PER_POSTING = 3
+WINDOWS_PER_POSTING = 1
 LINKEDIN_SNIPPETS_PER_POSTING = 2
+# Sample weights relative to an original EMSCAD posting (1.0). At 3 windows per posting and
+# full weight, extras were over four fifths of each fold and diluted whole-posting signal:
+# EMSCAD test scams caught as high risk fell from B's 80% to 53%. One window per posting
+# plus these weights recovered 73%, cut false alarms on LinkedIn snippets from 27% to 15%,
+# and kept or improved every Reddit and challenge-set rate.
+WEIGHT_WINDOW = 0.3
+WEIGHT_LINKEDIN = 0.5
+WEIGHT_REDDIT = 1.0
 
 
 def _windows(text, k, rng, lo=10, hi=35):
@@ -46,21 +54,26 @@ def _realworld_train():
     reddit = df[(df["source"] == "reddit") & (df["text_kind"] == "quoted_message")]
     postings = df[(df["source"] == "linkedin") & (df["text_kind"] == "posting")]
     snips = [(snippet(t, seed=i), 0) for t in postings["text"] for i in range(LINKEDIN_SNIPPETS_PER_POSTING)]
-    rows = list(zip(reddit["text"], reddit["label"])) + list(zip(postings["text"], postings["label"])) + snips
-    texts, labels = zip(*rows)
-    return list(texts), list(labels)
+    rows = ([(t, lab, WEIGHT_REDDIT) for t, lab in zip(reddit["text"], reddit["label"])]
+            + [(t, lab, WEIGHT_LINKEDIN) for t, lab in zip(postings["text"], postings["label"])]
+            + [(t, lab, WEIGHT_LINKEDIN) for t, lab in snips])
+    texts, labels, weights = zip(*rows)
+    return list(texts), list(labels), list(weights)
 
 
 def training_extras(X_train, y_train, seed=0):
+    """Extra rows for one training fold, with their sample weights."""
     rng = random.Random(seed)
-    texts, labels = [], []
+    texts, labels, weights = [], [], []
     for text, label in zip(X_train["text"], y_train):
         for w in _windows(text, WINDOWS_PER_POSTING, rng):
             texts.append(w)
             labels.append(label)
-    rw_texts, rw_labels = _realworld_train()
+            weights.append(WEIGHT_WINDOW)
+    rw_texts, rw_labels, rw_weights = _realworld_train()
     texts += rw_texts
     labels += rw_labels
+    weights += rw_weights
     X = build_frame(pd.DataFrame({"description": texts}))
     X.index = [f"aug{i}" for i in range(len(X))]
-    return X, pd.Series(np.asarray(labels, dtype=int), index=X.index)
+    return X, pd.Series(np.asarray(labels, dtype=int), index=X.index), np.asarray(weights, dtype=float)

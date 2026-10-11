@@ -46,6 +46,23 @@ label noise in the false-alarm numbers.
 - **Unreleased:** a Reddit study of 175,430 scam messages ([arXiv 2605.16656](https://arxiv.org/abs/2605.16656))
   and a carrier study of 1.35M reports ([arXiv 2508.05276](https://arxiv.org/abs/2508.05276)). Worth emailing the authors.
 
+## Known issue: Reddit numbers partly measure Reddit's writing style
+
+Reddit training rows are almost all scams (156 scam vs 17 legitimate quoted messages in
+the current cache), so a model can learn "sounds like an r/Scams post" as a scam signal.
+Measured on the eval split with tier F (1 window per posting, weighted extras):
+
+| | F with Reddit rows | F without Reddit rows |
+|---|---|---|
+| Reddit scam posts marked high | 96% | 10% |
+| Legitimate Reddit posts flagged medium or high (n=12) | 100% | 50% |
+| EMSCAD test scams marked high | 69% | 75% |
+
+With only 12 legitimate Reddit posts, real scam detection and style can't be separated.
+Don't quote the Reddit catch rate on its own; it needs more legitimate Reddit messages
+(or non-Reddit modern scam messages) before it means much. EMSCAD, LinkedIn and
+challenge-set numbers don't depend on this.
+
 ## Splits
 
 - Reddit: posts before 2025-07-01 train, later posts evaluate (scams from after the cutoff).
