@@ -51,16 +51,8 @@ def gap_table(tiers=("B",), models_dir=MODELS_DIR, challenge_csv=CHALLENGE_CSV, 
     return pd.DataFrame(rows)
 
 
-def _text_sha256(path):
-    """Hash of a text file with Windows checkouts' CRLF mapped back to LF, so every machine agrees."""
-    import hashlib
-
-    data = Path(path).read_bytes().replace(b"\r\n", b"\n")
-    return hashlib.sha256(data).hexdigest()
-
-
 def _inputs():
-    return {"model_sha256": sha256(DEPLOYED_MODEL), "challenge_sha256": _text_sha256(CHALLENGE_CSV)}
+    return {"model_sha256": sha256(DEPLOYED_MODEL), "challenge_sha256": sha256(CHALLENGE_CSV)}
 
 
 def save_deployed_gap():

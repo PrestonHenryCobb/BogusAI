@@ -106,10 +106,13 @@ any = medium or high). Run on 2026-10-11 with the committed models (`models/`):
 |---|---:|---:|---:|---:|---:|
 | Rules | 17/20 | 17/20 | 0 | 20/20 | 20/20 |
 | Tier B | 4/20 | 2/20 | 3 | 11/20 | 9/20 |
-| Tier F | 6/20 | 5/20 | 2 | 15/20 | 16/20 |
+| Tier F | 8/20 | 6/20 | 4 | 16/20 | 15/20 |
 
 "Lost" counts pairs where the original was rated high and its paraphrase was not.
-Tier F catches more originals than B and loses fewer pairs on rewording. Tier C is not shown: its numbers come from the missing-metadata shortcut. Tier FE
+Tier F catches twice as many originals as B, and loses about as many on rewording
+(its remaining misses are "refundable ... activation charge" for "fee", "sign-up
+amount" for "registration", and a Telegram move worded as "avoid contacting the
+office"). Tier C is not shown: its numbers come from the missing-metadata shortcut. Tier FE
 will not be used, so only B and F are compared.
 
 Read with care: the rules were written while looking at these rows, so their zero
@@ -124,17 +127,18 @@ thresholds from each artifact (chosen on EMSCAD):
 |---|---:|---:|
 | ROC-AUC | 0.60 | 0.82 |
 | PR-AUC | 0.51 | 0.70 |
-| Scams rated high risk | 10% | 36% |
-| Scams rated low risk | 51% | 18% |
-| Precision at high | 0.67 | 0.78 |
-| Non-scam rows rated high | 3.1% | 6.2% |
+| Scams rated high risk | 10% | 41% |
+| Scams rated low risk | 51% | 15% |
+| Precision at high | 0.67 | 0.79 |
+| Non-scam rows rated high | 3.1% | 7.0% |
 | Hard negatives rated high (48) | 4% | 10% |
 
-F closes much of the gap but more legitimate rows are rated high than under B. The
-crowd-work rows show where: F rates 2 of those 6 high (an app-testing invite that says
-"reply YES", and a survey panel that cashes out to a gift card), against 1 for B.
-On live postings, F with the crowd-work negatives rates none of the 12 Appen voice-recording
-postings high (the earlier F rated 5 of 12 high); see `docs/LIMITATIONS.md`.
+F closes much of the gap but is not a clean win: more legitimate rows are rated high.
+The new crowd-work rows show where: F rates 2 of those 6 high (an app-testing invite
+that says "reply YES", and a survey panel that cashes out to a gift card), against 1 for B.
+On live postings, 4 of the 5 that F + rules flags high are one employer's voice-recording
+crowd-work tasks. Task-based legitimate work looks like a task scam to a model trained on
+Reddit task-scam messages.
 
 All numbers use the model alone; the app also applies the red-flag rules. The challenge
 set is single-writer and was used to write the rules, so treat it as an optimistic

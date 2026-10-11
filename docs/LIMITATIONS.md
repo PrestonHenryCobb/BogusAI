@@ -16,10 +16,10 @@ site, and what to say to judges or reviewers.
 
 | Limitation | Evidence |
 |---|---|
-| Modern scams are still partly missed by the model | Challenge set (80 scams): tier F rates 36% high and 18% low; tier B rates 10% high and 51% low. The app also applies red-flag rules, which add coverage on explicit phrasing |
-| Rewording loses some catches | 20 original/paraphrase pairs: F rates 6 originals high and 5 paraphrases high |
-| F flags more short fragments than B | Live postings from employer boards (413): F + rules flags 0.2% high (1) and 2.4% medium or high, against 0.2% and 1.2% for B + rules. On 17-word cuts of those postings, 13% are flagged medium or high (B: 10%) |
-| Some legitimate task-based work still looks like a task scam | Tier F rates 2 of 6 crowd-work hard negatives high (HARD-043 to HARD-048): an app-testing invite that says "Reply YES" and a survey panel that cashes out to a gift card. The voice-recording postings that used to be flagged (Appen, 5 of 12 high under the earlier F) now read low. See "Known cause" below |
+| Modern scams are still partly missed by the model | Challenge set (80 scams): tier F rates 41% high and 15% low; tier B rates 10% high and 51% low. The app also applies red-flag rules, which add coverage on explicit phrasing |
+| Rewording loses some catches | 20 original/paraphrase pairs: F rates 8 originals high and 6 paraphrases high |
+| F trades recall for false alarms | Live postings from employer boards (413): F + rules flags 1.2% high (5) and 2.7% medium or high, against 0.2% and 1.2% for B + rules. 4 of the 5 are one employer's voice-recording crowd-work tasks. On 17-word cuts of those postings, 13% are flagged medium or high |
+| Legitimate task-based work looks like a task scam | Tier F rates 2 of 6 crowd-work hard negatives high (HARD-043 to HARD-048). Cause: the words "speech" and "AI" have near-zero weight in B (-0.22, -0.10) but strongly scam-positive in F (+3.45, +1.83), because modern AI-data-task language appears in F's training data only in Reddit scam messages and never in a legitimate example. See "Known cause" below |
 | One known rule false alarm | A marketing posting whose job duty is to purchase gift cards for giveaways is flagged high |
 | The rules are phrase matchers with a sentence-level warning check | They miss synonyms, leetspeak and text in images; a sentence like "we never ask for fees and you must pay a $60 fee" is still suppressed |
 | The challenge set is a draft | 208 rows, one writer (Claude), second-pass reviewed but not human-validated, and the red-flag rules were written while looking at it, so its scores are optimistic |
@@ -32,17 +32,8 @@ postings (conventional jobs, all legitimate) and Reddit scam messages (about 90%
 so modern AI-training, voice-recording and annotation gigs show up in training only as
 scams. The model learned the topic, not the scam. In EMSCAD itself, "speech" postings are
 less fraudulent than average (2.7% vs 4.8%). The fix is data: legitimate modern task work
-as training negatives from employers that are not in the evaluation set.
-
-**Done on 2026-10-11:** `src/realworld/crowdwork.py` adds 11 task-like postings from
-other employers' boards plus 400 task-like postings from LinkedIn training companies
-as legitimate extras (weight 2.0), and F was retrained. Against an F rebuilt from the
-same Reddit cache without them: Appen postings rated high 5 to 0 of 12, live postings
-flagged high (model + rules) 6 to 1, EMSCAD test recall at high 70.7% to 68.0%,
-challenge-set recall unchanged. Caveats: the training set is small (11 genuine
-crowd-work postings), the live check has only 12 Appen postings, and 23 of the team's
-979 indexed Reddit rows were not in the rebuilding machine's cache, so this F is not
-bit-for-bit the one it replaced (challenge-set scams rated high: 36% vs 41%).
+as training negatives from employers that are not in the evaluation set. Retraining F
+needs the LinkedIn and Reddit caches (see `docs/REALWORLD_DATA.md`).
 
 ## Framing for the cost of an error
 A false alarm costs a student a minute of verification. A missed scam can cost their

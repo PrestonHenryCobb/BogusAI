@@ -33,11 +33,6 @@ LINKEDIN_SNIPPETS_PER_POSTING = 2
 WEIGHT_WINDOW = 0.3
 WEIGHT_LINKEDIN = 0.5
 WEIGHT_REDDIT = 1.0
-# Legitimate task-based work (src/realworld/crowdwork.py): the counterweight to Reddit's task scams.
-# 1.0 cut Appen false alarms 5 -> 2 of 12; 2.0 gets 0 of 12 with the same EMSCAD recall (68.0%);
-# 4.0 is no better, so 2.0.
-WEIGHT_CROWDWORK = 2.0
-INCLUDE_CROWDWORK = True
 
 
 def _windows(text, k, rng, lo=10, hi=35):
@@ -62,12 +57,6 @@ def _realworld_train():
     rows = ([(t, lab, WEIGHT_REDDIT) for t, lab in zip(reddit["text"], reddit["label"])]
             + [(t, lab, WEIGHT_LINKEDIN) for t, lab in zip(postings["text"], postings["label"])]
             + [(t, lab, WEIGHT_LINKEDIN) for t, lab in snips])
-    if INCLUDE_CROWDWORK:
-        from src.realworld import crowdwork
-
-        cw = crowdwork.load()
-        rows += [(t, 0, WEIGHT_CROWDWORK) for t in cw]
-        rows += [(snippet(t, seed=i), 0, WEIGHT_LINKEDIN) for t in cw for i in range(LINKEDIN_SNIPPETS_PER_POSTING)]
     texts, labels, weights = zip(*rows)
     return list(texts), list(labels), list(weights)
 
