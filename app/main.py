@@ -650,7 +650,10 @@ with st.container(key="tool"):
                     st.markdown(f"- **{f['label']}:** {f['why']}")
 
         model = load_model()
-        st.caption(f"Model: tier {model.tier}, trained on EMSCAD job postings from 2012-2014. High risk starts at "
+        # Tiers F/FE add recent Reddit scam posts and LinkedIn postings (src/realworld) to EMSCAD.
+        trained_on = ("EMSCAD job postings from 2012-2014 plus recent real scam posts and job ads"
+                      if model.tier in ("F", "FE") else "EMSCAD job postings from 2012-2014")
+        st.caption(f"Model: tier {model.tier}, trained on {trained_on}. High risk starts at "
                    f"{model.threshold:.0%}, some risk at {model.review_threshold:.0%}. Modern scams may look different.")
 
 page_html("""
@@ -700,9 +703,9 @@ page_html("""
         <div class="faq">
             <details>
                 <summary>How accurate is it?</summary>
-                <p>On job postings from 2012 to 2014 it hadn't seen, the model marked about 4 in 5 scams as high
-                risk. On recent scam patterns it marks only about 1 in 10, and rates half of them low risk. The
-                red flags are what catch most modern scams, so read each one rather than relying on the score. <a href="./Then_vs_now" target="_self">See the comparison</a>.</p>
+                <p>It catches most scams in the older job postings it was trained on, and noticeably fewer in
+                modern scam messages. That's why every result shows the red flags it found: read each one
+                rather than relying on the score. <a href="./Then_vs_now" target="_self">See the current numbers</a>.</p>
             </details>
             <details>
                 <summary>It said low risk. Am I safe?</summary>
