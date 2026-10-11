@@ -692,10 +692,10 @@ page_html("""
             <h2 class="serif-lg">A second opinion, not a verdict.</h2>
             <p>BogusAI is a student project from HackLanta 2026. It points out what looks wrong so you
             know what to check. It never decides for you whether an employer is real.</p>
-            <p>The model learned from job postings collected between 2012 and 2014. Scams have changed since then,
+            <p>The model learned mostly from job postings collected between 2012 and 2014. Scams have changed since then,
             so we also test it against recent scam patterns written from public warnings. That's why every result
             shows its reasons instead of just a score.</p>
-            <p>Nothing you paste is saved. It's scored in memory and discarded when you close the tab.</p>
+            <p>This app doesn't save what you paste. It's scored in memory and the app doesn't write it anywhere.</p>
         </div>
     </div>
 </section>
