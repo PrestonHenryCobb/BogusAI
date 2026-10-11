@@ -4,7 +4,7 @@ __pycache__/
 venv/
 .env
 
-# processed/derived data stays out; raw EMSCAD csv is committed on purpose (private repo)
+# processed/derived data stays out; the raw EMSCAD csv is committed so the pipeline runs as cloned (see README for attribution)
 data/processed/*.csv
 !data/processed/.gitkeep
 
