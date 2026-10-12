@@ -9,6 +9,17 @@ import streamlit as st
 
 BRAND = "BogusAI"
 LOGO = Path(__file__).parent / "assets" / "BogusAI-2.svg"
+FAVICON = Path(__file__).parent / "assets" / "favicon.png"  # 512 px; browsers scale it for the tab
+
+
+def page_icon():
+    """The tab icon for st.set_page_config; falls back to an emoji if the file is missing."""
+    try:
+        from PIL import Image
+
+        return Image.open(FAVICON)
+    except Exception:
+        return "🔎"
 
 BASE_CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;700&display=swap');

@@ -8,7 +8,7 @@ import streamlit as st
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from background import render_background  # noqa: E402
-from theme import BRAND, apply_theme, brand_html, page_html, render_nav  # noqa: E402
+from theme import BRAND, apply_theme, brand_html, page_html, page_icon, render_nav  # noqa: E402
 from src.model.predict import MODEL_PATH, load_model, predict  # noqa: E402
 from src.model.verdict import combined_risk, display_risk  # noqa: E402
 from src.redflags import MAX_CHARS, find_red_flags  # noqa: E402
@@ -78,7 +78,7 @@ def render_verdict(risk):
 # centered section heads over card grids, one inverted band with alternating feature
 # rows, an FAQ accordion, and a closing CTA band. Colors stay dark. GhostFibers fills
 # the page behind the hero and the closing band; every section between them is solid.
-st.set_page_config(page_title=BRAND, page_icon="🔎", layout="wide")
+st.set_page_config(page_title=BRAND, page_icon=page_icon(), layout="wide")
 render_background()
 apply_theme()
 render_nav()

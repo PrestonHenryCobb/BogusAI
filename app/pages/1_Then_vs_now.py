@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.model.gap import CHALLENGE_CSV, deployed_gap_table  # noqa: E402
 from src.model.predict import MODEL_PATH, load_model  # noqa: E402
 from background import render_background  # noqa: E402
-from theme import apply_theme, render_nav  # noqa: E402
+from theme import apply_theme, page_icon, render_nav  # noqa: E402
 
 DATASETS = {"EMSCAD test": "2012-2014 postings", "Challenge set": "Modern scams"}
 MEASURES = {
@@ -30,7 +30,7 @@ def load_gap(model_mtime):  # mtime: reload after a retrain
     return deployed_gap_table()
 
 
-st.set_page_config(page_title="Then vs now", page_icon="🔎", layout="wide")
+st.set_page_config(page_title="Then vs now", page_icon=page_icon(), layout="wide")
 render_background()
 apply_theme()
 render_nav(skip_target="#main")
