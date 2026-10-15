@@ -31,3 +31,24 @@ models/*
 Thumbs.db
 .vscode/
 .idea/
+
+# Python tooling and builds
+*.egg-info/
+build/
+/dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# secrets and local config (never commit)
+.env.*
+.streamlit/secrets.toml
+
+# JavaScript (app/frontend has its own .gitignore; this covers stray installs)
+node_modules/
+
+# logs and local tool state
+*.log
+.claude/

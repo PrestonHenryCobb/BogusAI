@@ -1,0 +1,10 @@
+# Model artifacts and images are binary: never diff or convert line endings.
+*.joblib binary
+*.png binary
+*.ico binary
+
+# The model manifest is hashed by tools; keep it byte-stable across platforms.
+models/SHA256SUMS text eol=lf
+
+# The EMSCAD CSV is large and third-party: don't try to diff it.
+data/raw/*.csv -diff

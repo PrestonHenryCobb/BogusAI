@@ -1,5 +1,8 @@
 'use client';
 
+// GhostFibers from React Bits by David Haz (https://github.com/DavidHDev/react-bits),
+// licensed MIT + Commons Clause License Condition v1.0. See THIRD_PARTY_NOTICES.md.
+
 import { useEffect, useRef } from 'react';
 
 import './GhostFibers.css';
