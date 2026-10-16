@@ -1,10 +1,32 @@
-# BogusAI
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="app/assets/BogusAI-2.svg">
+    <img alt="BogusAI" src="docs/assets/bogusai-wordmark-dark.svg" width="360">
+  </picture>
+</p>
 
-**Paste a job posting or a recruiter's message. See the exact red flags and why they matter, before you reply.**
+<p align="center">
+  <b>Paste a job posting or a recruiter's message. See the exact red flags and why they matter, before you reply.</b>
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue"></a>
+  <img alt="Python 3.12" src="https://img.shields.io/badge/python-3.12-3776AB">
+  <img alt="scikit-learn" src="https://img.shields.io/badge/scikit--learn-1.7.1-F7931E">
+  <img alt="Streamlit" src="https://img.shields.io/badge/app-Streamlit-FF4B4B">
+  <img alt="HackLanta 2026" src="https://img.shields.io/badge/HackLanta-2026-d0912f">
+</p>
+
+<p align="center">
+  <a href="https://bogus.biz">Live demo</a> ·
+  <a href="docs/LIMITATIONS.md">Limitations</a> ·
+  <a href="docs/SECURITY_TESTING.md">Security testing</a> ·
+  <a href="THIRD_PARTY_NOTICES.md">Third-party notices</a>
+</p>
 
 BogusAI checks job offers for the patterns scammers reuse: upfront fees, checks you are asked to deposit and send back, moves to chat apps, early requests for bank or ID details, and pay that is too good for the work. It was built in 48 hours by team **LOCALHOST** at HackLanta 2026.
 
-> This repository is Preston Cobb's copy of the team project, with the full commit history and every contributor's authorship preserved. The original team repository is [drwwwww/localhost_hacklanta_26](https://github.com/drwwwww/localhost_hacklanta_26). The team's live demo was hosted at https://bogus.biz.
+> This is Preston Cobb's copy of the team project, with the full commit history and every contributor's authorship preserved. Original team repository: [drwwwww/localhost_hacklanta_26](https://github.com/drwwwww/localhost_hacklanta_26).
 
 ## Why we built it
 
@@ -14,31 +36,30 @@ Most published fake-job detectors are trained on a dataset of 2012-2014 postings
 
 ## What it does
 
-- Scores a pasted posting or message with a text model and highlights the phrases that match known scam patterns, each with a plain-language reason.
-- Shows the stricter of the model's risk and the red-flag rules' risk, and says "Too short to judge" instead of "Low risk" when there is too little text.
-- Does not save or log what you paste. There are no accounts, and nothing is stored.
+- **Shows its work.** Highlights the phrases that match known scam patterns, each with a plain-language reason.
+- **Takes the stricter view.** The verdict is the higher of the model's risk and the red-flag rules' risk.
+- **Says when it can't tell.** Short text gets "Too short to judge" instead of a false "Low risk".
+- **Keeps nothing.** No accounts, and what you paste is not saved or logged.
 
 ## How it works
 
 | Piece | What it is |
 |---|---|
-| Model | TF-IDF and logistic regression (scikit-learn). The deployed model, tier F (`models/model.joblib`), is trained on EMSCAD job postings plus short windows of them and real modern data: LinkedIn postings and scam messages quoted on r/Scams |
-| Red-flag rules | Ten rules with severity and an explanation each (`src/redflags`), with Unicode normalization against disguised lettering and a sentence-level check so an employer's "we will never ask you to pay a fee" is not flagged |
-| Evaluation | A 208-row synthetic challenge set of modern scams, hard negatives and paraphrases (`data/challenge_set`), 413 live postings from employer career boards, and paraphrase robustness checks |
-| App | Streamlit, with an animated React/WebGL background (`app/`) |
+| **Model** | TF-IDF and logistic regression (scikit-learn). The deployed tier F (`models/model.joblib`) is trained on EMSCAD job postings, short windows of them, and real modern data: LinkedIn postings and scam messages quoted on r/Scams |
+| **Red-flag rules** | Ten rules with severity and an explanation each, with Unicode normalization against disguised lettering and a check so an employer's "we will never ask you to pay a fee" is not flagged |
+| **Evaluation** | A 208-row modern challenge set (scams, hard negatives, paraphrases), 413 live postings from employer career boards, and paraphrase robustness checks |
+| **App** | Streamlit, with an animated React/WebGL background |
 
 ## Results
-
-Thresholds are chosen on EMSCAD, not tuned on the challenge set.
 
 | Test | Scams marked high risk | Measured with |
 |---|---|---|
 | EMSCAD test postings (2012-2014) | about 7 in 10 | the app's verdict (model and rules) |
-| Modern challenge set | about 4 in 10 (our first model, tier B: 1 in 10) | the model alone |
+| Modern challenge set | about 4 in 10 (first model: 1 in 10) | the model alone |
 
-On 413 live legitimate postings, the model plus rules flags about 1 in 80 as high risk. Details, caveats and known false alarms are in [docs/LIMITATIONS.md](docs/LIMITATIONS.md). The challenge set is single-writer and was used to write the rules, so treat its scores as optimistic.
+On 413 live legitimate postings, the model plus rules flags about 1 in 80 as high risk. Thresholds are chosen on EMSCAD, not tuned on the challenge set. The challenge set is single-writer and was used to write the rules, so treat its scores as optimistic. Details and known false alarms: [docs/LIMITATIONS.md](docs/LIMITATIONS.md).
 
-## Run it
+## Quick start
 
 Tested with Python 3.12.
 
@@ -49,22 +70,23 @@ pip install -r requirements.txt
 streamlit run app/main.py
 ```
 
-The trained models are committed, so no training is needed. Check them against the manifest after cloning:
+The trained models are committed, so no training is needed.
+
+<details>
+<summary><b>Tests and model verification</b></summary>
 
 ```bash
-python -m src.model.verify_models
-```
-
-## Tests
-
-```bash
+python -m src.model.verify_models    # check committed models against models/SHA256SUMS
 python -m unittest tests.test_verify_models tests.test_robustness tests.test_display tests.test_context tests.test_redflags tests.test_security tests.test_realworld
 python tests/app_smoke.py            # runs the real app headlessly
 ```
 
 How to demo the security protections: [docs/SECURITY_TESTING.md](docs/SECURITY_TESTING.md).
 
-## Rebuilding the data and models
+</details>
+
+<details>
+<summary><b>Rebuilding the data and models</b></summary>
 
 ```bash
 python -m src.pipeline.build_splits     # dedupe + group split -> data/processed/splits.json
@@ -76,7 +98,10 @@ python -m src.model.live_eval           # false alarms on live postings (fetch t
 
 The real-world data (LinkedIn postings, Reddit scam messages, live career-board postings) is rebuilt from IDs and caches; the commands and terms are in [docs/REALWORLD_DATA.md](docs/REALWORLD_DATA.md).
 
-## Repo layout
+</details>
+
+<details>
+<summary><b>Repo layout</b></summary>
 
 ```
 app/                # Streamlit app; frontend/ is the built React background
@@ -95,7 +120,10 @@ src/
 tests/
 ```
 
-## App background
+</details>
+
+<details>
+<summary><b>App background</b></summary>
 
 The animated background is React Bits' `GhostFibers` (raw WebGL2), in `app/frontend`. It's
 built to one self-contained `app/frontend/dist/index.html` and embedded behind the page by
@@ -108,11 +136,14 @@ npm install
 npm run build        # writes dist/index.html -- commit the result
 ```
 
+</details>
+
 ## Team
 
 **LOCALHOST** (HackLanta 2026): Andrew Bernadel, Preston Cobb, Tanvir Patwary. The work was split into four roles: data pipeline, modeling, challenge set and red flags, and product and demo ([docs/LABOR_DIVISION.md](docs/LABOR_DIVISION.md)). Every commit in this history keeps its original author.
 
-### My part (Preston Cobb)
+<details>
+<summary><b>My part (Preston Cobb)</b></summary>
 
 I owned the challenge set and red-flag role, and the security and honesty work around it:
 
@@ -120,6 +151,8 @@ I owned the challenge set and red-flag role, and the security and honesty work a
 - Wrote the red-flag rule engine and its tests, including the fix that stops it flagging employers' own anti-scam notices.
 - Hardened the app: input length cap, Unicode normalization against disguised lettering, HTML-escaping tests, privacy wording, and the "Too short to judge" verdict.
 - Added the SHA-256 manifest and check for the committed model files, pinned scikit-learn to the version the models were saved with, and wrote the limitations and security-testing docs.
+
+</details>
 
 ## Responsible use
 
