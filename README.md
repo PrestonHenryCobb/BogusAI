@@ -24,6 +24,12 @@
   <a href="THIRD_PARTY_NOTICES.md">Third-party notices</a>
 </p>
 
+<p align="center">
+  <img alt="BogusAI rating the built-in scam posting example High risk, with seven red flags underlined and explained" src="docs/assets/screenshot-scam-posting.jpg" width="720">
+  <br>
+  <sub>The built-in "Scam posting" example: rated High risk, with each red flag underlined and explained.</sub>
+</p>
+
 BogusAI checks job offers for the patterns scammers reuse: upfront fees, checks you are asked to deposit and send back, moves to chat apps, early requests for bank or ID details, and pay that is too good for the work. It was built in 48 hours by team **LOCALHOST** at HackLanta 2026.
 
 > This is Preston Cobb's copy of the team project, with the full commit history and every contributor's authorship preserved. Original team repository: [drwwwww/localhost_hacklanta_26](https://github.com/drwwwww/localhost_hacklanta_26).
