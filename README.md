@@ -148,6 +148,8 @@ npm run build        # writes dist/index.html -- commit the result
 
 **LOCALHOST** (HackLanta 2026): Andrew Bernadel, Preston Cobb, Tanvir Patwary. The work was split into four roles: data pipeline, modeling, challenge set and red flags, and product and demo ([docs/LABOR_DIVISION.md](docs/LABOR_DIVISION.md)). Every commit in this history keeps its original author.
 
+**How we built it:** we used Claude (via Claude Code) to assist in writing, testing and documenting the code; design decisions, evaluation and the final review were ours.
+
 <details>
 <summary><b>My part (Preston Cobb)</b></summary>
 
